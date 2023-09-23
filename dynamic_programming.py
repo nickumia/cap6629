@@ -75,8 +75,8 @@ gamma = 0.9
 (B)
 '''
 #
-#Policy: |S| x |A| array
-#P[i][j]= prob of choosing action j in state i
+# Policy: |S| x |A| array
+# P[i][j]= prob of choosing action j in state i
 #
 # 2-1) initialize policy P with uniform policy
 P = np.ones((no_states, no_actions)) * (1 / no_actions)
@@ -97,8 +97,10 @@ def policy_eval(policy, max_iter):
 
     # V value begins with 0
     V = np.zeros(no_states)
+    no_iter = 0
 
-    for i in range(max_iter):
+    diff = 1
+    while diff > 0.01 and no_iter < max_iter:
         for a in range(no_actions):
             for s in range(no_states):
                 # for a in range(no_actions):
@@ -108,8 +110,10 @@ def policy_eval(policy, max_iter):
                     v_all += T[s][sp][a] * V[sp]
                 q = R[s][a] + gamma * v_all
                 V[s] += P[s][a] * q
+        no_iter += 1
 
-    return V
+    return (V, no_iter)
+
 
 #
 # 2-3) implement policy improvement with V value using greedy method
@@ -128,11 +132,11 @@ def extract_policy(V):
     '''
 
     # initialize random(uniform) policy
-    P = np.zeros(no_states)
+    P = np.zeros((no_states, no_actions))
     for s in range(no_states):
         best_action = 0
         max_q = 0
-        for i,a in enumerate(range(no_actions)):
+        for i, a in enumerate(range(no_actions)):
             v_all = 0
             for sp in range(no_states):
                 v_all += T[s][sp][a] * V[sp]
@@ -143,6 +147,7 @@ def extract_policy(V):
         P[s][best_action] = max_q
 
     return P
+
 
 #
 # 2-4) implement policy iteration method
@@ -164,18 +169,22 @@ def policy_iter(in_policy, max_iter):
     '''
 
     # Initialization P and V using np.zeros
-    P =
-    V =
+    P = np.zeros((no_states, no_actions))
+    V_0 = np.zeros(no_states)
     no_iter = 0
+    convergance = np.ones(no_states) * 0.01
+    diff = False
 
-    #
-    # complete this part
-    # you can use 'policy_eval' and 'extract_policy' function
-    #
-
+    while not diff and no_iter < max_iter:
+        V_1, no_iter_2 = policy_eval(P, max_iter)
+        P = extract_policy(V)
+        diff = all(V_1 - V_0 < convergance)
+        V_0 = V_1
+        no_iter += no_iter_2
 
     # returns policy, state value, and # of iteration
     return [P, V, no_iter]
+
 
 #
 # 2-5) implement value iteration method
@@ -197,11 +206,24 @@ def value_iter(in_V, max_iter):
     # Initialization V using np.zeros
     V = np.zeros(no_states)
     no_iter = 0
+    diff = 1
+    while diff > 0.01 and no_iter < max_iter:
+        for s in range(no_states):
+            for a in range(no_actions):
+                v_all = 0
+                for sp in range(no_states):
+                    v_all += T[s][sp][a] * V[sp]
+                v = R[s][a] + gamma * v_all
+                diff = v - V[s]
+                if diff > 0:
+                    V[s] = v
+        no_iter += 1
 
     return [V, no_iter]
 
-'''
 
+'''
+C
 '''
 
 # show the results of prediction (policy evaluation) for random(uniform) policy
@@ -209,15 +231,10 @@ def value_iter(in_V, max_iter):
 #
 
 # extract policy
-[V,nIterations,epsilon] = mdp.valueIteration(initialV=np.zeros(mdp.nStates))
+V = np.zeros(no_states)
+(V, no_iter) = value_iter(V, 100000)
+print('a', no_iter)
 
-policy = mdp.extractPolicy(V)
-
-V = mdp.evaluatePolicy()
-
-[policy,V,iterId] = mdp.policyIteration()
-
-[V,iterId,epsilon] = mdp.evaluatePolicyPartially()
-
-[policy,V,iterId,tolerance] = mdp.modifiedPolicyIteration()
-
+P = extract_policy(V)
+(P, V, no_iter) = policy_iter(P, 100000)
+print('b', no_iter)
