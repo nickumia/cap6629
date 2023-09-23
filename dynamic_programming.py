@@ -101,6 +101,17 @@ def policy_eval(policy, max_iter):
     #
     # complete this part
     #
+    for i in range(max_iter):
+        for a in range(no_actions):
+            for s in range(no_states):
+                q = 0
+                # for a in range(no_actions):
+                v_all = 0
+                # for a in range(no_actions):
+                for sp in range(no_states):
+                    v_all += T[s][sp][a] * V[sp]
+                q += R[s][a] + gamma * v_all
+                V[s] += P[s][a] * q
 
     return V
 
