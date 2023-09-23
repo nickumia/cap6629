@@ -129,6 +129,18 @@ def extract_policy(V):
 
     # initialize random(uniform) policy
     P = np.zeros(no_states)
+    for s in range(no_states):
+        best_action = 0
+        max_q = 0
+        for i,a in enumerate(range(no_actions)):
+            v_all = 0
+            for sp in range(no_states):
+                v_all += T[s][sp][a] * V[sp]
+            q = R[s][a] + gamma * v_all
+            if q > max_q:
+                best_action = i
+                max_q = q
+        P[s][best_action] = max_q
 
     return P
 
