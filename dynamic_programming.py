@@ -4,8 +4,9 @@ import numpy as np
 
 # depending on the size of your Grid
 # define the size of states (|column| * |row|)
-no_states=
-no_actions=4
+no_states = 100
+no_actions = 4
+alpha = 0.05
 
 # Transition probability is |S| x |S'| x |A| array
 # T[i][j][k]= prob. moving from state i to j when doing action k
@@ -14,42 +15,71 @@ no_actions=4
 #
 
 '''
-(A)
+A
+'''
+
+'''
+Map Legend | (s): start | (b): block | (e): end
+
+    0   1   2   3   4   5   6   7   8   9
+0   s           b       s           b
+1   b       b   b   b           b
+2
+3       b               b
+4   b                                   b
+5                       b
+6           b                           e
+7
+8                   b               b
+9           e
 '''
 #
-# B is an array that stores block state numbers 
-# B=
-#
+# B is an array that stores block state numbers
+B = [3, 8, 10, 12, 13, 14, 17, 31, 35, 40, 49,
+     55, 62, 84, 88]
 
-# 
+#
 # 1-1) deterministic transition
 #    agent moves to its intented next state with prob=1.0
 
-#    complete T matrix for degtterministic transition
-#T = 
+#    complete T matrix for deterministic transition
+T = np.ones((no_states, no_states, no_actions))
+for b in B:
+    if b - 10 > 0 and (b - 10) not in B:
+        # Space above block
+        T[b - 10][b][:] = 0
+    if b + 10 < no_states and (b + 10) not in B:
+        # Space below block
+        T[b + 10][b][:] = 0
+    if b + 1 < 100 and (b + 1) not in B:
+        # Space to the right of block
+        T[b + 1][b][:] = 0
+    if b - 1 > 0 and (b - 1) not in B:
+        # Space to the left of block
+        T[b - 1][b][:] = 0
 
 # 1-2) probabiistic transition
-#    
+#
 #    complete T matrix for probabilistic transition
-#T = 
+T = T * (1 - no_actions * alpha)
 
 # 1-3) Reward function: |S| x |A| array
 # R[i][j]= reward from state i and action j
 # each move generates -1 reward
-#R = 
+R = np.ones((no_states, no_actions)) * -1
 
 # Discount factor: scalar in [0,1)
-#gamma = 0.9        
+gamma = 0.9
 
 '''
 (B)
 '''
 #
 #Policy: |S| x |A| array
-#P[i][j]= prob of choosing action j in state i 
+#P[i][j]= prob of choosing action j in state i
 #
 # 2-1) initialize policy P with uniform policy
-P=
+P = np.ones((no_states, no_actions)) * (1 / no_actions)
 
 
 # 2-2) implement prediction (policy evaluation)
@@ -77,7 +107,7 @@ def policy_eval(policy, max_iter):
 #
 # 2-3) implement policy improvement with V value using greedy method
 # The formula for choosing the best action using V value is given in question.
-# 
+#
 def extract_policy(V):
     '''
     Procedure to extract a policy from a value function
@@ -99,24 +129,24 @@ def extract_policy(V):
 # 2-4) implement policy iteration method
 # implement policy iteration in slide page 13
 def policy_iter(in_policy, max_iter):
-    
-    '''    Policy iteration procedure: alternate between 
-    1) policy evaluation (solve V^pi = R^pi + gamma T^pi V^pi) and 
+
+    '''    Policy iteration procedure: alternate between
+    1) policy evaluation (solve V^pi = R^pi + gamma T^pi V^pi) and
     2) policy improvement (pi <-- argmax_a R^a + gamma T^a V^pi).
 
     Inputs:
     in_policy -- Initial policy
     max_iter -- maximum # of iterations: scalar (use a large number)
 
-    Outputs: 
+    Outputs:
     policy -- Policy P
     V -- Value function: array of |S| entries
     no_iter -- the actual # of iterations peformed by policy iteration: scalar
     '''
 
     # Initialization P and V using np.zeros
-    P = 
-    V = 
+    P =
+    V =
     no_iter = 0
 
     #
@@ -140,15 +170,15 @@ def value_iter(in_V, max_iter):
     in_V -- Initial value function: array of |S| entries
     max_iter -- limit on the # of iterations: scalar (use large number)
 
-    Outputs: 
+    Outputs:
     V -- Value function: array of |S| entries
     no_iter -- the actual # of iterations peformed by policy iteration: scalar
     '''
-        
+
     # Initialization V using np.zeros
     V = np.zeros(no_states)
     no_iter = 0
-        
+
     return [V, no_iter]
 
 '''
@@ -157,9 +187,9 @@ def value_iter(in_V, max_iter):
 
 # show the results of prediction (policy evaluation) for random(uniform) policy
 
-# 
+#
 
-# extract policy 
+# extract policy
 [V,nIterations,epsilon] = mdp.valueIteration(initialV=np.zeros(mdp.nStates))
 
 policy = mdp.extractPolicy(V)
