@@ -2,23 +2,18 @@
 import numpy as np
 # import any necessary package
 
-# depending on the size of your Grid
-# define the size of states (|column| * |row|)
+# States: size of your Grid (|column| * |row|)
 no_states = 100
+# Actions: up|down|left|right
 no_actions = 4
+# Probabiistic Transition:
 alpha = 0.05
+# Discount factor: scalar in [0,1)
+gamma = 0.9
 
-# Transition probability is |S| x |S'| x |A| array
-# T[i][j][k]= prob. moving from state i to j when doing action k
-#
-# moving out of boundary or to block stays in current state
-#
+'''''''''''''''''''''''''''''''''''''''''
+Section 0 (Part 2)
 
-'''
-A
-'''
-
-'''
 Map Legend | (s): start | (b): block | (e): end
 
     0   1   2   3   4   5   6   7   8   9
@@ -32,17 +27,21 @@ Map Legend | (s): start | (b): block | (e): end
 7
 8                   b               b
 9           e
-'''
-#
-# B is an array that stores block state numbers
+'''''''''''''''''''''''''''''''''''''''''
+# States that have obstacles
 B = [3, 8, 10, 12, 13, 14, 17, 31, 35, 40, 49,
      55, 62, 84, 88]
 
-#
-# 1-1) deterministic transition
-#    agent moves to its intented next state with prob=1.0
+'''''''''''''''''''''''''''''''''''''''''
+Section A (Part 3-1)
+'''''''''''''''''''''''''''''''''''''''''
+# Transition probability is |S| x |S'| x |A| array
+# T[i][j][k]= prob. moving from state i to j when doing action k
+# moving out of boundary or to block stays in current state
 
-#    complete T matrix for deterministic transition
+# 1-1) Deterministic Transition
+#       agent moves to its intented next state with prob=1.0
+#       complete T matrix for deterministic transition
 T = np.ones((no_states, no_states, no_actions))
 for b in B:
     if b - 10 > 0 and (b - 10) not in B:
@@ -58,33 +57,28 @@ for b in B:
         # Space to the left of block
         T[b - 1][b][:] = 0
 
-# 1-2) probabiistic transition
-#
-#    complete T matrix for probabilistic transition
+# 1-2) Probabiistic Transition
+#       complete T matrix for probabilistic transition
 T = T * (1 - no_actions * alpha)
 
-# 1-3) Reward function: |S| x |A| array
-# R[i][j]= reward from state i and action j
-# each move generates -1 reward
+# 1-3) Reward Function: |S| x |A| array
+#       R[i][j]= reward from state i and action j
+#       each move generates -1 reward
 R = np.ones((no_states, no_actions)) * -1
 
-# Discount factor: scalar in [0,1)
-gamma = 0.9
-
-'''
-(B)
-'''
-#
+'''''''''''''''''''''''''''''''''''''''''
+Section B (Part 3-2)
+'''''''''''''''''''''''''''''''''''''''''
 # Policy: |S| x |A| array
 # P[i][j]= prob of choosing action j in state i
-#
-# 2-1) initialize policy P with uniform policy
+
+# 2-1) Random(uniform) Policy
+#       initialize policy P with uniform policy
 P = np.ones((no_states, no_actions)) * (1 / no_actions)
 
-
-# 2-2) implement prediction (policy evaluation)
-# compute V values from a policy
-# implement prediction(policy evaluation) algorithm in slide page 7.
+# 2-2) Implement Prediction (Policy Evaluation)
+#       compute V values from a policy
+#       implement prediction(policy evaluation) algorithm in slide page 7.
 def policy_eval(policy, max_iter):
     '''
     Input:
@@ -115,10 +109,8 @@ def policy_eval(policy, max_iter):
     return (V, no_iter)
 
 
-#
-# 2-3) implement policy improvement with V value using greedy method
-# The formula for choosing the best action using V value is given in question.
-#
+# 2-3) Implement Policy Improvement with V value using Greedy Method
+#       The formula for choosing the best action using V value is given in question.
 def extract_policy(V):
     '''
     Procedure to extract a policy from a value function
@@ -133,6 +125,7 @@ def extract_policy(V):
 
     # initialize random(uniform) policy
     P = np.zeros((no_states, no_actions))
+
     for s in range(no_states):
         best_action = 0
         max_q = 0
@@ -149,9 +142,8 @@ def extract_policy(V):
     return P
 
 
-#
-# 2-4) implement policy iteration method
-# implement policy iteration in slide page 13
+# 2-4) Implement Policy Iteration Method
+#       implement policy iteration in slide page 13
 def policy_iter(in_policy, max_iter):
 
     '''    Policy iteration procedure: alternate between
@@ -186,9 +178,8 @@ def policy_iter(in_policy, max_iter):
     return [P, V, no_iter]
 
 
-#
-# 2-5) implement value iteration method
-# implement value iteration in slide page 23
+# 2-5) Implement Value Iteration Method
+#       implement value iteration in slide page 23
 def value_iter(in_V, max_iter):
     '''
     Value iteration procedure
@@ -222,19 +213,26 @@ def value_iter(in_V, max_iter):
     return [V, no_iter]
 
 
-'''
-C
-'''
+'''''''''''''''''''''''''''''''''''''''''
+Section C (Part 4)
+'''''''''''''''''''''''''''''''''''''''''
 
-# show the results of prediction (policy evaluation) for random(uniform) policy
+# 4.1.1a Random(uniform) Policy defined above
+# 4.1.1b Show the results of policy_eva
+V, no_iter = policy_eval(P, 1000)
+print(V)
+print("Number of Iterations: %d" % (no_iter))
 
-#
+# 4.1.2 Run Policy Iteration and show the results
+(P, V, no_iter) = policy_iter(P, 1000)
+print(P)
+print(V)
+print("Number of Iterations: %d" % (no_iter))
 
-# extract policy
-V = np.zeros(no_states)
-(V, no_iter) = value_iter(V, 100000)
-print('a', no_iter)
+# 4.1.3a Run Value Iteration and show the results
+(V, no_iter) = value_iter(V, 1000)
+print("Number of Iterations: %d" % (no_iter))
 
+# 4.1.3b Extract policy from V values
 P = extract_policy(V)
-(P, V, no_iter) = policy_iter(P, 100000)
 print('b', no_iter)
