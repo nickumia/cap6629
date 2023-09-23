@@ -4,7 +4,7 @@ import numpy as np
 
 # States: size of your Grid (|column| * |row|)
 no_states = 100
-# Actions: up|down|left|right
+# Actions: up(0)|down(1)|left(2)|right(3)
 no_actions = 4
 # Probabiistic Transition:
 alpha = 0.05
@@ -42,7 +42,19 @@ Section A (Part 3-1)
 # 1-1) Deterministic Transition
 #       agent moves to its intented next state with prob=1.0
 #       complete T matrix for deterministic transition
-T = np.ones((no_states, no_states, no_actions))
+T = np.zeros((no_states, no_states, no_actions))
+for i in range(no_states):
+    if i / 10 != 0 and i != (no_states-1):
+        # Leftward movements
+        T[i][i+1][2] = 1
+    if i % 10 != 0:
+        # Rightward movements
+        T[i][i-1][3] = 1
+    if i < 89:
+        T[i][i+10][1] = 1
+    if i > 9:
+        T[i][i-10][0] = 1
+
 for b in B:
     if b - 10 > 0 and (b - 10) not in B:
         # Space above block
@@ -76,6 +88,7 @@ Section B (Part 3-2)
 #       initialize policy P with uniform policy
 P = np.ones((no_states, no_actions)) * (1 / no_actions)
 
+
 # 2-2) Implement Prediction (Policy Evaluation)
 #       compute V values from a policy
 #       implement prediction(policy evaluation) algorithm in slide page 7.
@@ -97,9 +110,7 @@ def policy_eval(policy, max_iter):
     while diff > 0.01 and no_iter < max_iter:
         for a in range(no_actions):
             for s in range(no_states):
-                # for a in range(no_actions):
                 v_all = 0
-                # for a in range(no_actions):
                 for sp in range(no_states):
                     v_all += T[s][sp][a] * V[sp]
                 q = R[s][a] + gamma * v_all
@@ -110,7 +121,8 @@ def policy_eval(policy, max_iter):
 
 
 # 2-3) Implement Policy Improvement with V value using Greedy Method
-#       The formula for choosing the best action using V value is given in question.
+#       The formula for choosing the best action using V value is given
+#       in question.
 def extract_policy(V):
     '''
     Procedure to extract a policy from a value function
@@ -219,20 +231,20 @@ Section C (Part 4)
 
 # 4.1.1a Random(uniform) Policy defined above
 # 4.1.1b Show the results of policy_eva
-V, no_iter = policy_eval(P, 1000)
+V, no_iter = policy_eval(P, 100)
 print(V)
 print("Number of Iterations: %d" % (no_iter))
 
 # 4.1.2 Run Policy Iteration and show the results
-(P, V, no_iter) = policy_iter(P, 1000)
-print(P)
-print(V)
-print("Number of Iterations: %d" % (no_iter))
-
-# 4.1.3a Run Value Iteration and show the results
-(V, no_iter) = value_iter(V, 1000)
-print("Number of Iterations: %d" % (no_iter))
-
-# 4.1.3b Extract policy from V values
-P = extract_policy(V)
-print('b', no_iter)
+# (P, V, no_iter) = policy_iter(P, 10)
+# # print(P)
+# # print(V)
+# print("Number of Iterations: %d" % (no_iter))
+#
+# # 4.1.3a Run Value Iteration and show the results
+# (V, no_iter) = value_iter(V, 10)
+# print("Number of Iterations: %d" % (no_iter))
+#
+# # 4.1.3b Extract policy from V values
+# P = extract_policy(V)
+# print('b', no_iter)
