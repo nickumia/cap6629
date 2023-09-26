@@ -73,12 +73,27 @@ for b in B:
 
 # 1-2) Probabiistic Transition
 #       complete T matrix for probabilistic transition
-T = T * (1 - no_actions * alpha)
+# T = T * (1 - no_actions * alpha)
 
 # 1-3) Reward Function: |S| x |A| array
 #       R[i][j]= reward from state i and action j
 #       each move generates -1 reward
 R = np.ones((no_states, no_actions)) * -1
+E = [69, 92]
+for e in E:
+    if e - 10 > 0:
+        # Space above block
+        R[e - 10][1] = 10
+    if e + 10 < no_states:
+        # Space below block
+        R[e + 10][0] = 10
+    if e + 1 < 100:
+        # Space to the right of block
+        R[e + 1][3] = 10
+    if e - 1 > 0:
+        # Space to the left of block
+        R[e - 1][2] = 10
+
 
 '''''''''''''''''''''''''''''''''''''''''
 Section B (Part 3-2)
