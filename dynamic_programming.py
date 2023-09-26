@@ -47,7 +47,7 @@ for i in range(no_states):
     if i / 10 != 0 and i != 0:
         # Leftward movements
         T[i][i-1][2] = 1
-    if ((i % 9 != 0 and i != (no_states-1)):
+    if (i % 9 != 0 and i != (no_states-1)):
         # Rightward movements
         T[i][i+1][3] = 1
     if i < 90:
@@ -120,21 +120,27 @@ def policy_eval(policy, max_iter):
     '''
 
     # V value begins with 0
-    V = np.zeros(no_states)
+    V_0 = np.zeros(no_states)
+    convergance = np.zeros(no_states) * 0.01
     no_iter = 0
 
-    diff = 1
-    while diff > 0.01 and no_iter < max_iter:
+    diff = False
+    while not diff and no_iter < max_iter:
+        V_1 = np.zeros(no_states)
         for a in range(no_actions):
             for s in range(no_states):
                 v_all = 0
                 for sp in range(no_states):
-                    v_all += T[s][sp][a] * V[sp]
+                    v_all += T[s][sp][a] * V_0[sp]
                 q = R[s][a] + gamma * v_all
-                V[s] += P[s][a] * q
+                V_1[s] += P[s][a] * q
+        print(V_1 - V_0)
+        # print(sum(V_1 - V_0 < convergance))
+        diff = all(V_1 - V_0 < convergance)
+        V_0 = np.copy(V_1)
         no_iter += 1
 
-    return (V, no_iter)
+    return (V_0, no_iter)
 
 
 # 2-3) Implement Policy Improvement with V value using Greedy Method
