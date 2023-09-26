@@ -196,7 +196,8 @@ def policy_iter(in_policy, max_iter):
     '''
 
     # Initialization P and V using np.zeros
-    P = np.zeros((no_states, no_actions))
+    # P = np.zeros((no_states, no_actions))
+    P = in_policy
     V_0 = np.zeros(no_states)
     no_iter = 0
     convergance = np.ones(no_states) * 0.01
@@ -230,7 +231,8 @@ def value_iter(in_V, max_iter):
     '''
 
     # Initialization V using np.zeros
-    V = np.zeros(no_states)
+    # V = np.zeros(no_states)
+    V = in_V
     no_iter = 0
     diff = 1
     while diff > 0.01 and no_iter < max_iter:
