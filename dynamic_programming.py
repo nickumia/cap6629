@@ -44,15 +44,17 @@ Section A (Part 3-1)
 #       complete T matrix for deterministic transition
 T = np.zeros((no_states, no_states, no_actions))
 for i in range(no_states):
-    if i / 10 != 0 and i != (no_states-1):
+    if i / 10 != 0 and i != 0:
         # Leftward movements
-        T[i][i+1][2] = 1
-    if i % 10 != 0:
+        T[i][i-1][2] = 1
+    if ((i % 9 != 0 and i != (no_states-1)):
         # Rightward movements
-        T[i][i-1][3] = 1
-    if i < 89:
+        T[i][i+1][3] = 1
+    if i < 90:
+        # Downward movement
         T[i][i+10][1] = 1
     if i > 9:
+        # Upwrd movement
         T[i][i-10][0] = 1
 
 for b in B:
