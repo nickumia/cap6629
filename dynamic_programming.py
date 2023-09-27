@@ -44,14 +44,17 @@ Section A (Part 3-1)
 #       complete T matrix for deterministic transition
 T = np.zeros((no_states, no_states, no_actions))
 for i in range(no_states):
-    if i / 10 != 0 and i != 0:
+    if i % 10 != 0:
         # Leftward movements
+        # print("LEFT", i, i-1)
         T[i][i-1][2] = 1
-    if (i % 9 != 0 and i != (no_states-1)):
+    if (i % 10 != 9 and i != (no_states-1)):
         # Rightward movements
+        # print('RIGHT', i, i+1)
         T[i][i+1][3] = 1
     if i < 90:
         # Downward movement
+        print("DOWN", i, i+10)
         T[i][i+10][1] = 1
     if i > 9:
         # Upwrd movement
@@ -121,7 +124,7 @@ def policy_eval(policy, max_iter):
 
     # V value begins with 0
     V_0 = np.zeros(no_states)
-    convergance = np.ones(no_states) * 0.01
+    convergance = np.zeros(no_states)
     no_iter = 0
 
     diff = False
@@ -198,7 +201,7 @@ def policy_iter(in_policy, max_iter):
     P = in_policy
     V_0 = np.zeros(no_states)
     no_iter = 0
-    convergance = np.ones(no_states) * 0.01
+    convergance = np.zeros(no_states)
     diff = False
 
     while not diff and no_iter < max_iter:
