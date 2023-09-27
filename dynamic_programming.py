@@ -121,7 +121,7 @@ def policy_eval(policy, max_iter):
 
     # V value begins with 0
     V_0 = np.zeros(no_states)
-    convergance = np.zeros(no_states) * 0.01
+    convergance = np.ones(no_states) * 0.01
     no_iter = 0
 
     diff = False
@@ -134,8 +134,6 @@ def policy_eval(policy, max_iter):
                     v_all += T[s][sp][a] * V_0[sp]
                 q = R[s][a] + gamma * v_all
                 V_1[s] += P[s][a] * q
-        print(V_1 - V_0)
-        # print(sum(V_1 - V_0 < convergance))
         diff = all(V_1 - V_0 < convergance)
         V_0 = np.copy(V_1)
         no_iter += 1
@@ -232,19 +230,24 @@ def value_iter(in_V, max_iter):
 
     # Initialization V using np.zeros
     # V = np.zeros(no_states)
-    V = in_V
+    V_0 = in_V
     no_iter = 0
-    diff = 1
-    while diff > 0.01 and no_iter < max_iter:
+    changed = 1
+    while changed != 0 and no_iter < max_iter:
+        V_1 = np.zeros(no_states)
+        changed = 0
         for s in range(no_states):
+            max_q = V_0[s]
             for a in range(no_actions):
                 v_all = 0
                 for sp in range(no_states):
-                    v_all += T[s][sp][a] * V[sp]
-                v = R[s][a] + gamma * v_all
-                diff = v - V[s]
-                if diff > 0:
-                    V[s] = v
+                    v_all += T[s][sp][a] * V_0[sp]
+                q = R[s][a] + gamma * v_all
+                V_1[s] += P[s][a] * q
+            if q > max_q:
+                max_q = q
+                changed += 1
+            V_0[s] = q
         no_iter += 1
 
     return [V, no_iter]
@@ -257,19 +260,20 @@ Section C (Part 4)
 # 4.1.1a Random(uniform) Policy defined above
 # 4.1.1b Show the results of policy_eva
 V, no_iter = policy_eval(P, 100)
-print(V)
+# print(V)
 print("Number of Iterations: %d" % (no_iter))
 
 # 4.1.2 Run Policy Iteration and show the results
-# (P, V, no_iter) = policy_iter(P, 10)
-# # print(P)
-# # print(V)
-# print("Number of Iterations: %d" % (no_iter))
-#
-# # 4.1.3a Run Value Iteration and show the results
-# (V, no_iter) = value_iter(V, 10)
-# print("Number of Iterations: %d" % (no_iter))
-#
-# # 4.1.3b Extract policy from V values
-# P = extract_policy(V)
-# print('b', no_iter)
+(P, V, no_iter) = policy_iter(P, 100)
+# print(P)
+# print(V)
+print("Number of Iterations: %d" % (no_iter))
+
+# 4.1.3a Run Value Iteration and show the results
+(V, no_iter) = value_iter(V, 1000)
+print(V)
+print("Number of Iterations: %d" % (no_iter))
+
+# 4.1.3b Extract policy from V values
+P = extract_policy(V)
+print('b', no_iter)
