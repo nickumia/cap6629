@@ -54,25 +54,27 @@ for i in range(no_states):
         T[i][i+1][3] = 1
     if i < 90:
         # Downward movement
-        print("DOWN", i, i+10)
+        # print("DOWN", i, i+10)
         T[i][i+10][1] = 1
     if i > 9:
         # Upwrd movement
         T[i][i-10][0] = 1
 
 for b in B:
-    if b - 10 > 0 and (b - 10) not in B:
+    if b - 10 >= 0 and (b - 10) not in B:
         # Space above block
-        T[b - 10][b][:] = 0
+        # print(b-10, 'above', b)
+        T[b - 10][b][1] = 0
     if b + 10 < no_states and (b + 10) not in B:
         # Space below block
-        T[b + 10][b][:] = 0
+        # print(b+10, 'below', b)
+        T[b + 10][b][0] = 0
     if b + 1 < 100 and (b + 1) not in B:
         # Space to the right of block
-        T[b + 1][b][:] = 0
+        T[b + 1][b][2] = 0
     if b - 1 > 0 and (b - 1) not in B:
         # Space to the left of block
-        T[b - 1][b][:] = 0
+        T[b - 1][b][3] = 0
 
 # 1-2) Probabiistic Transition
 #       complete T matrix for probabilistic transition
@@ -166,14 +168,14 @@ def extract_policy(V):
         best_action = 0
         max_q = 0
         for i, a in enumerate(range(no_actions)):
-            v_all = 0
+            v = 0
             for sp in range(no_states):
-                v_all += T[s][sp][a] * V[sp]
-            q = R[s][a] + gamma * v_all
+                v += T[s][sp][a] * V[sp]
+            q = abs(R[s][a] + gamma * v)
             if q > max_q:
                 best_action = i
                 max_q = q
-        P[s][best_action] = max_q
+        P[s][best_action] = 1
 
     return P
 
