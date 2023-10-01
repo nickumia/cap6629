@@ -1,9 +1,9 @@
 
 import numpy as np
-# import any necessary package
 
 # States: size of your Grid (|column| * |row|)
 no_states = 100
+elements_in_row = 10
 # Actions: up(0)|down(1)|left(2)|right(3)
 no_actions = 4
 # Probabiistic Transition:
@@ -44,32 +44,32 @@ Section A (Part 3-1)
 #       complete T matrix for deterministic transition
 T = np.zeros((no_states, no_states, no_actions))
 for i in range(no_states):
-    if i % 10 != 0:
+    if i % elements_in_row != 0:
         # Leftward movements
         # print("LEFT", i, i-1)
         T[i][i-1][2] = 1
-    if (i % 10 != 9 and i != (no_states-1)):
+    if (i % elements_in_row != (elements_in_row-1) and i != (no_states-1)):
         # Rightward movements
         # print('RIGHT', i, i+1)
         T[i][i+1][3] = 1
-    if i < 90:
+    if i < (no_states - elements_in_row):
         # Downward movement
         # print("DOWN", i, i+10)
         T[i][i+10][1] = 1
-    if i > 9:
+    if i > elements_in_row:
         # Upwrd movement
         T[i][i-10][0] = 1
 
 for b in B:
-    if b - 10 >= 0 and (b - 10) not in B:
+    if b - elements_in_row >= 0 and (b - elements_in_row) not in B:
         # Space above block
         # print(b-10, 'above', b)
-        T[b - 10][b][1] = 0
-    if b + 10 < no_states and (b + 10) not in B:
+        T[b - elements_in_row][b][1] = 0
+    if b + elements_in_row < no_states and (b + elements_in_row) not in B:
         # Space below block
         # print(b+10, 'below', b)
-        T[b + 10][b][0] = 0
-    if b + 1 < 100 and (b + 1) not in B:
+        T[b + elements_in_row][b][0] = 0
+    if b + 1 < no_states and (b + 1) not in B:
         # Space to the right of block
         T[b + 1][b][2] = 0
     if b - 1 > 0 and (b - 1) not in B:
@@ -85,14 +85,15 @@ for b in B:
 #       each move generates -1 reward
 R = np.ones((no_states, no_actions)) * -1
 E = [69, 92]
+# E = [30]
 for e in E:
-    if e - 10 > 0:
+    if e - elements_in_row > 0:
         # Space above block
-        R[e - 10][1] = 10
-    if e + 10 < no_states:
+        R[e - elements_in_row][1] = 10
+    if e + elements_in_row < no_states:
         # Space below block
-        R[e + 10][0] = 10
-    if e + 1 < 100:
+        R[e + elements_in_row][0] = 10
+    if e + 1 < no_states:
         # Space to the right of block
         R[e + 1][3] = 10
     if e - 1 > 0:
