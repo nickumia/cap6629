@@ -12,13 +12,15 @@ no_states = 36
 elements_in_row = 6
 # Actions: up(0)|down(1)|left(2)|right(3)
 no_actions = 4
-get_action = lambda x: 'up' if x == 0 else 'down' if x == 1 else 'left' if x == 2 else 'right'
+get_action = {0: '^', 1: 'v', 2: '<', 3: '>'}
 # Probabiistic Transition:
 alpha = 0.05
 # Discount factor: scalar in [0,1)
 gamma = 0.9
 # Goal Reward
-reward = 0
+reward = -10
+# GUI on?
+gui = True
 
 '''''''''''''''''''''''''''''''''''''''''
 Section 0 (Part 2)
@@ -281,8 +283,6 @@ Section C (Part 4)
 
 # 4.1.2 Run Policy Iteration and show the results
 (P, V, no_iter) = policy_iter(P, 500)
-for i,s in enumerate(P):
-    print(i, s)
 print(V)
 print("Number of Iterations: %d" % (no_iter))
 
@@ -299,37 +299,57 @@ print("Number of Iterations: %d" % (no_iter))
 '''''''''''''''''''''''''''''''''''''''''
 Section D (Extra)
 '''''''''''''''''''''''''''''''''''''''''
-maze = Map2D(elements_in_row + 2, elements_in_row + 2)
-for e in E:
-    maze.map[(math.floor(e / elements_in_row)) + 1][(e % elements_in_row) + 1] = 20
-for b in B:
-    maze.map[(math.floor(b / elements_in_row)) + 1][(b % elements_in_row) + 1] = 5
+policy = Map2D(elements_in_row + 2, elements_in_row + 2)
+for i, s in enumerate(P):
+    action = np.where(s == 1)[0][0]
+    y = (i % elements_in_row) + 1
+    x = (math.floor(i / elements_in_row)) + 1
+    print(x, y, action, get_action[action])
+    plt.text(y, x, get_action[action], color='green')
+    plt.imshow(policy.map, 'pink')
+plt.savefig('policy.png')
+plt.clf()
 
-agent_loc = 0
-x = [1]
-y = [1]
-for i in range(10):
-    # Starting position
-    maze.map[x[0]][y[0]] = 30
-    # Actions: up(0)|down(1)|left(2)|right(3)
-    maze.map[x[-1], y[-1]] = 10
-    action = np.where(P[agent_loc] == 1)[0][0]
-    if action == 0:
-        agent_loc -= elements_in_row
-    elif action == 1:
-        agent_loc += elements_in_row
-    elif action == 2:
-        agent_loc -= 1
-    elif action == 3:
-        agent_loc += 1
-    y.append((agent_loc % elements_in_row) + 1)
-    x.append((math.floor(agent_loc / elements_in_row)) + 1)
-    # label = "Time Elapsed:%d; Utility: %.1f" % (i, 0)
-    # plt.text(0, 0, label)
-    plt.imshow(maze.map, 'pink')
-    plt.ion()
-    plt.show()
-    plt.pause(0.5)
-    plt.plot(y, x, 'r:', linewidth=1)
-    plt.plot(y[-1], x[-1], '*r', 'Maze Runner', 5)
-    maze.map[x[-2], y[-2]] = 0
+
+if gui:
+    maze = Map2D(elements_in_row + 2, elements_in_row + 2)
+    for e in E:
+        maze.map[
+            (math.floor(e / elements_in_row)) + 1][
+            (e % elements_in_row) + 1
+            ] = 20
+    for b in B:
+        maze.map[
+            (math.floor(b / elements_in_row)) + 1][
+            (b % elements_in_row) + 1
+            ] = 5
+
+    agent_loc = 0
+    x = [1]
+    y = [1]
+    for i in range(10):
+        # Starting position
+        maze.map[x[0]][y[0]] = 30
+        # Actions: up(0)|down(1)|left(2)|right(3)
+        maze.map[x[-1], y[-1]] = 10
+        action = np.where(P[agent_loc] == 1)[0][0]
+        print(i, P[agent_loc])
+        if action == 0:
+            agent_loc -= elements_in_row
+        elif action == 1:
+            agent_loc += elements_in_row
+        elif action == 2:
+            agent_loc -= 1
+        elif action == 3:
+            agent_loc += 1
+        y.append((agent_loc % elements_in_row) + 1)
+        x.append((math.floor(agent_loc / elements_in_row)) + 1)
+        # label = "Time Elapsed:%d; Utility: %.1f" % (i, 0)
+        # plt.text(0, 0, label)
+        plt.imshow(maze.map, 'pink')
+        plt.ion()
+        plt.show()
+        plt.pause(0.1)
+        plt.plot(y, x, 'r:', linewidth=1)
+        plt.plot(y[-1], x[-1], '*r', 'Maze Runner', 5)
+        maze.map[x[-2], y[-2]] = 0
