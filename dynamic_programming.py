@@ -304,7 +304,6 @@ for i, s in enumerate(P):
     action = np.where(s == 1)[0][0]
     y = (i % elements_in_row) + 1
     x = (math.floor(i / elements_in_row)) + 1
-    print(x, y, action, get_action[action])
     plt.text(y, x, get_action[action], color='green')
     plt.imshow(policy.map, 'pink')
 plt.savefig('policy.png')
@@ -327,13 +326,12 @@ if gui:
     agent_loc = 0
     x = [1]
     y = [1]
-    for i in range(10):
+    while agent_loc not in E:
         # Starting position
         maze.map[x[0]][y[0]] = 30
         # Actions: up(0)|down(1)|left(2)|right(3)
         maze.map[x[-1], y[-1]] = 10
         action = np.where(P[agent_loc] == 1)[0][0]
-        print(i, P[agent_loc])
         if action == 0:
             agent_loc -= elements_in_row
         elif action == 1:
