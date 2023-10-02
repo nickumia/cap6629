@@ -3,7 +3,6 @@ import numpy as np
 from cap6635.environment.map import Map2D
 import math
 import matplotlib.pyplot as plt
-import time
 
 import matplotlib
 matplotlib.use('TkAgg')
@@ -13,6 +12,7 @@ no_states = 36
 elements_in_row = 6
 # Actions: up(0)|down(1)|left(2)|right(3)
 no_actions = 4
+get_action = lambda x: 'up' if x == 0 else 'down' if x == 1 else 'left' if x == 2 else 'right'
 # Probabiistic Transition:
 alpha = 0.05
 # Discount factor: scalar in [0,1)
@@ -275,52 +275,61 @@ Section C (Part 4)
 
 # 4.1.1a Random(uniform) Policy defined above
 # 4.1.1b Show the results of policy_eva
-V, no_iter = policy_eval(P, 100)
+# V, no_iter = policy_eval(P, 1000)
 # print(V)
-print("Number of Iterations: %d" % (no_iter))
+# print("Number of Iterations: %d" % (no_iter))
 
 # 4.1.2 Run Policy Iteration and show the results
-(P, V, no_iter) = policy_iter(P, 100)
-# print(P)
-# print(V)
-print("Number of Iterations: %d" % (no_iter))
-
-# 4.1.3a Run Value Iteration and show the results
-(V, no_iter) = value_iter(V, 1000)
+(P, V, no_iter) = policy_iter(P, 500)
+for i,s in enumerate(P):
+    print(i, s)
 print(V)
 print("Number of Iterations: %d" % (no_iter))
 
+# 4.1.3a Run Value Iteration and show the results
+# (V, no_iter) = value_iter(V, 1000)
+# print(V)
+# print("Number of Iterations: %d" % (no_iter))
+
 # 4.1.3b Extract policy from V values
-P = extract_policy(V)
-print('b', no_iter)
+# P = extract_policy(V)
+# print('Number of Iterations: %d' % (no_iter))
 
 
 '''''''''''''''''''''''''''''''''''''''''
 Section D (Extra)
 '''''''''''''''''''''''''''''''''''''''''
-# maze = Map2D(11, 11)
-# 
-# agent_loc = 0
-# x = 0
-# y = 0
-# for i in range(10):
-#     # Actions: up(0)|down(1)|left(2)|right(3)
-#     maze.map[x, y] = 10
-#     action = np.where(P[agent_loc] == 1)[0][0]
-#     if action == 0:
-#         agent_loc -= 10
-#     elif action == 1:
-#         agent_loc += 10
-#     elif action == 2:
-#         agent_loc -= 1
-#     elif action == 3:
-#         agent_loc += 1
-#     y = (agent_loc % 10) + 1
-#     x = (math.floor(agent_loc / 10)) + 1
-#     time.sleep(0.5)
-#     # label = "Time Elapsed:%d; Utility: %.1f" % (agent.time, agent.utility)
-#     # plt.text(0, 0, label)
-#     plt.imshow(maze.map, 'pink')
-#     plt.show()
-#     # plt.plot(agent.y_path, agent.x_path, 'r:', linewidth=1)
-#     # plt.plot(agent.y_path[-1], agent.x_path[-1], '*r', 'Robot field', 5)
+maze = Map2D(elements_in_row + 2, elements_in_row + 2)
+for e in E:
+    maze.map[(math.floor(e / elements_in_row)) + 1][(e % elements_in_row) + 1] = 20
+for b in B:
+    maze.map[(math.floor(b / elements_in_row)) + 1][(b % elements_in_row) + 1] = 5
+
+agent_loc = 0
+x = [1]
+y = [1]
+for i in range(10):
+    # Starting position
+    maze.map[x[0]][y[0]] = 30
+    # Actions: up(0)|down(1)|left(2)|right(3)
+    maze.map[x[-1], y[-1]] = 10
+    action = np.where(P[agent_loc] == 1)[0][0]
+    if action == 0:
+        agent_loc -= elements_in_row
+    elif action == 1:
+        agent_loc += elements_in_row
+    elif action == 2:
+        agent_loc -= 1
+    elif action == 3:
+        agent_loc += 1
+    y.append((agent_loc % elements_in_row) + 1)
+    x.append((math.floor(agent_loc / elements_in_row)) + 1)
+    # label = "Time Elapsed:%d; Utility: %.1f" % (i, 0)
+    # plt.text(0, 0, label)
+    plt.imshow(maze.map, 'pink')
+    plt.ion()
+    plt.show()
+    plt.pause(0.5)
+    plt.plot(y, x, 'r:', linewidth=1)
+    plt.plot(y[-1], x[-1], '*r', 'Maze Runner', 5)
+    maze.map[x[-2], y[-2]] = 0
