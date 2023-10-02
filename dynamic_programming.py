@@ -1,5 +1,12 @@
 
 import numpy as np
+from cap6635.environment.map import Map2D
+import math
+import matplotlib.pyplot as plt
+import time
+
+import matplotlib
+matplotlib.use('TkAgg')
 
 # States: size of your Grid (|column| * |row|)
 no_states = 100
@@ -283,3 +290,34 @@ print("Number of Iterations: %d" % (no_iter))
 # 4.1.3b Extract policy from V values
 P = extract_policy(V)
 print('b', no_iter)
+
+
+'''''''''''''''''''''''''''''''''''''''''
+Section D (Extra)
+'''''''''''''''''''''''''''''''''''''''''
+# maze = Map2D(11, 11)
+# 
+# agent_loc = 0
+# x = 0
+# y = 0
+# for i in range(10):
+#     # Actions: up(0)|down(1)|left(2)|right(3)
+#     maze.map[x, y] = 10
+#     action = np.where(P[agent_loc] == 1)[0][0]
+#     if action == 0:
+#         agent_loc -= 10
+#     elif action == 1:
+#         agent_loc += 10
+#     elif action == 2:
+#         agent_loc -= 1
+#     elif action == 3:
+#         agent_loc += 1
+#     y = (agent_loc % 10) + 1
+#     x = (math.floor(agent_loc / 10)) + 1
+#     time.sleep(0.5)
+#     # label = "Time Elapsed:%d; Utility: %.1f" % (agent.time, agent.utility)
+#     # plt.text(0, 0, label)
+#     plt.imshow(maze.map, 'pink')
+#     plt.show()
+#     # plt.plot(agent.y_path, agent.x_path, 'r:', linewidth=1)
+#     # plt.plot(agent.y_path[-1], agent.x_path[-1], '*r', 'Robot field', 5)
