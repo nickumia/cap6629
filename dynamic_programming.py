@@ -9,14 +9,16 @@ import matplotlib
 matplotlib.use('TkAgg')
 
 # States: size of your Grid (|column| * |row|)
-no_states = 100
-elements_in_row = 10
+no_states = 36
+elements_in_row = 6
 # Actions: up(0)|down(1)|left(2)|right(3)
 no_actions = 4
 # Probabiistic Transition:
 alpha = 0.05
 # Discount factor: scalar in [0,1)
 gamma = 0.9
+# Goal Reward
+reward = 0
 
 '''''''''''''''''''''''''''''''''''''''''
 Section 0 (Part 2)
@@ -36,8 +38,9 @@ Map Legend | (s): start | (b): block | (e): end
 9           e
 '''''''''''''''''''''''''''''''''''''''''
 # States that have obstacles
-B = [3, 8, 10, 12, 13, 14, 17, 31, 35, 40, 49,
-     55, 62, 84, 88]
+# B = [3, 8, 10, 12, 13, 14, 17, 31, 35, 40, 49,
+#      55, 62, 84, 88]
+B = [3, 8, 10, 12, 14, 17, 31, 35]
 
 '''''''''''''''''''''''''''''''''''''''''
 Section A (Part 3-1)
@@ -62,10 +65,10 @@ for i in range(no_states):
     if i < (no_states - elements_in_row):
         # Downward movement
         # print("DOWN", i, i+10)
-        T[i][i+10][1] = 1
+        T[i][i + elements_in_row][1] = 1
     if i > elements_in_row:
         # Upwrd movement
-        T[i][i-10][0] = 1
+        T[i][i - elements_in_row][0] = 1
 
 for b in B:
     if b - elements_in_row >= 0 and (b - elements_in_row) not in B:
@@ -92,20 +95,20 @@ for b in B:
 #       each move generates -1 reward
 R = np.ones((no_states, no_actions)) * -1
 E = [69, 92]
-# E = [30]
+E = [30]
 for e in E:
     if e - elements_in_row > 0:
         # Space above block
-        R[e - elements_in_row][1] = 10
+        R[e - elements_in_row][1] = reward
     if e + elements_in_row < no_states:
         # Space below block
-        R[e + elements_in_row][0] = 10
+        R[e + elements_in_row][0] = reward
     if e + 1 < no_states:
         # Space to the right of block
-        R[e + 1][3] = 10
+        R[e + 1][3] = reward
     if e - 1 > 0:
         # Space to the left of block
-        R[e - 1][2] = 10
+        R[e - 1][2] = reward
 
 
 '''''''''''''''''''''''''''''''''''''''''
