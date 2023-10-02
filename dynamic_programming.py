@@ -140,8 +140,8 @@ def policy_eval(policy, max_iter):
     convergance = np.zeros(no_states)
     no_iter = 0
 
-    diff = False
-    while not diff and no_iter < max_iter:
+    diff = np.ones(no_states)
+    while any(diff != convergance) and no_iter < max_iter:
         V_1 = np.zeros(no_states)
         for a in range(no_actions):
             for s in range(no_states):
@@ -149,8 +149,8 @@ def policy_eval(policy, max_iter):
                 for sp in range(no_states):
                     v_all += T[s][sp][a] * V_0[sp]
                 q = R[s][a] + gamma * v_all
-                V_1[s] += P[s][a] * q
-        diff = all(V_1 - V_0 < convergance)
+                V_1[s] += policy[s][a] * q
+        diff = abs(V_1 - V_0)
         V_0 = np.copy(V_1)
         no_iter += 1
 
@@ -219,13 +219,13 @@ def policy_iter(in_policy, max_iter):
 
     while not diff and no_iter < max_iter:
         V_1, no_iter_2 = policy_eval(P, max_iter)
-        P = extract_policy(V)
+        P = extract_policy(V_1)
         diff = all(V_1 - V_0 < convergance)
-        V_0 = V_1
+        V_0 = np.copy(V_1)
         no_iter += no_iter_2
 
     # returns policy, state value, and # of iteration
-    return [P, V, no_iter]
+    return (P, V_1, no_iter)
 
 
 # 2-5) Implement Value Iteration Method
