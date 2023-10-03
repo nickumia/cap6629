@@ -282,18 +282,19 @@ Section C (Part 4)
 # print("Number of Iterations: %d" % (no_iter))
 
 # 4.1.2 Run Policy Iteration and show the results
-(P, V, no_iter) = policy_iter(P, 500)
-print(V)
-print("Number of Iterations: %d" % (no_iter))
-
-# 4.1.3a Run Value Iteration and show the results
-# (V, no_iter) = value_iter(V, 1000)
+# (P, V, no_iter) = policy_iter(P, 500)
 # print(V)
 # print("Number of Iterations: %d" % (no_iter))
 
+# 4.1.3a Run Value Iteration and show the results
+V = np.zeros(no_states)
+(V, no_iter) = value_iter(V, 1000)
+print(V)
+print("Number of Iterations: %d" % (no_iter))
+
 # 4.1.3b Extract policy from V values
-# P = extract_policy(V)
-# print('Number of Iterations: %d' % (no_iter))
+P = extract_policy(V)
+print(P)
 
 
 '''''''''''''''''''''''''''''''''''''''''
