@@ -42,7 +42,7 @@ Map Legend | (s): start | (b): block | (e): end
 # States that have obstacles
 # B = [3, 8, 10, 12, 13, 14, 17, 31, 35, 40, 49,
 #      55, 62, 84, 88]
-B = [3, 8, 10, 12, 14, 17, 31, 35]
+B = [3, 8, 10, 14, 17, 31, 35]
 
 '''''''''''''''''''''''''''''''''''''''''
 Section A (Part 3-1)
@@ -250,7 +250,7 @@ def value_iter(in_V, max_iter):
     # V = np.zeros(no_states)
     V_0 = in_V
     no_iter = 0
-    changed = 1
+    changed = no_states
     while changed != 0 and no_iter < max_iter:
         V_1 = np.zeros(no_states)
         changed = 0
@@ -261,8 +261,8 @@ def value_iter(in_V, max_iter):
                 for sp in range(no_states):
                     v_all += T[s][sp][a] * V_0[sp]
                 q = R[s][a] + gamma * v_all
-                V_1[s] += P[s][a] * q
-            if q > max_q:
+                V_1[s] = q
+            if abs(q) > abs(max_q):
                 max_q = q
                 changed += 1
             V_0[s] = q
@@ -347,7 +347,7 @@ if gui:
         plt.imshow(maze.map, 'pink')
         plt.ion()
         plt.show()
-        plt.pause(0.1)
+        plt.pause(0.3)
         plt.plot(y, x, 'r:', linewidth=1)
         plt.plot(y[-1], x[-1], '*r', 'Maze Runner', 5)
         maze.map[x[-2], y[-2]] = 0
