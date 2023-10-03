@@ -215,19 +215,19 @@ def policy_iter(in_policy, max_iter):
     # P = np.zeros((no_states, no_actions))
     P = in_policy
     V_0 = np.zeros(no_states)
-    no_iter = 0
     convergance = np.zeros(no_states)
-    diff = False
+    diff = np.ones(no_states)
+    no_iter = 0
 
-    while not diff and no_iter < max_iter:
+    while any(diff != convergance) and no_iter < max_iter:
         V_1, no_iter_2 = policy_eval(P, max_iter)
         P = extract_policy(V_1)
-        diff = all(V_1 - V_0 < convergance)
+        diff = abs(V_1 - V_0)
         V_0 = np.copy(V_1)
         no_iter += no_iter_2
 
     # returns policy, state value, and # of iteration
-    return (P, V_1, no_iter)
+    return (P, V_0, no_iter)
 
 
 # 2-5) Implement Value Iteration Method
