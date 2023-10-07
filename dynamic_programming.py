@@ -56,7 +56,7 @@ E = [69, 92]
 # 1-3) Reward Function: |S| x |A| array
 #       R[i][j]= reward from state i and action j
 #       each move generates -1 reward
-R = np.ones((no_states, no_actions)) * goal_reward
+R = np.ones((no_states, no_actions)) * state_reward * 10
 for e in E:
     R[e][:] = state_reward
 
