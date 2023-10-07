@@ -20,7 +20,7 @@ gamma = 1
 # Goal Reward
 reward = 0
 # GUI on?
-gui = False
+gui = True
 
 '''''''''''''''''''''''''''''''''''''''''
 Section 0 (Part 2)
@@ -287,21 +287,19 @@ def value_iter(in_V, max_iter):
     no_iter = 0
 
     diff = np.ones(no_states)
+    V_1 = np.zeros(no_states)
     while any(diff != convergance) and no_iter < max_iter:
-        V_1 = np.zeros(no_states)
         for s in range(no_states):
             max_q = V_0[s]
+            all_q = []
             for a in range(no_actions):
                 v_all = 0
                 for sp in range(no_states):
                     v_all += T[s][sp][a] * V_0[sp]
                 q = R[s][a] + gamma * v_all
-                V_1[s] = q
-                if abs(q) > abs(max_q):
-                    max_q = q
-                    V_1[s] = q
-        diff = abs(V_1 - V_0)
-        no_iter += 1
+                all_q.append(q)
+            V_1[s] = max(all_q)
+        diff = V_1 - V_0
         V_0 = np.copy(V_1)
         no_iter += 1
 
@@ -324,8 +322,8 @@ Section C (Part 4)
 # print("Number of Iterations: %d" % (no_iter))
 
 # 4.1.3a Run Value Iteration and show the results
-V = np.zeros(no_states)
-(V, no_iter) = value_iter(V, 1000)
+V = np.ones(no_states) * -10000000
+(V, no_iter) = value_iter(V, 500)
 print(V)
 print("Number of Iterations: %d" % (no_iter))
 
@@ -364,9 +362,12 @@ if gui:
             (b % elements_in_row) + 1
             ] = 5
 
-    agent_loc = 0
-    x = [1]
-    y = [1]
+    agent_loc = 9
+    x = [3]
+    y = [2]
+    # agent_loc = 6
+    # x = [2]
+    # y = [3]
     while agent_loc not in E:
         # Starting position
         maze.map[x[0]][y[0]] = 30
