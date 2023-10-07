@@ -216,12 +216,12 @@ def extract_policy(V):
 
     for s in range(no_states):
         best_action = 0
-        max_q = 0
+        max_q = -100000000
         for i, a in enumerate(range(no_actions)):
             v = 0
             for sp in range(no_states):
                 v += T[s][sp][a] * V[sp]
-            q = abs(R[s][a] + gamma * v)
+            q = R[s][a] + gamma * v
             if q > max_q:
                 best_action = i
                 max_q = q
