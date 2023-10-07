@@ -8,19 +8,19 @@ import matplotlib
 matplotlib.use('TkAgg')
 
 # States: size of your Grid (|column| * |row|)
-no_states = 36
-elements_in_row = 6
+elements_in_row = 4
+no_states = elements_in_row ** 2
 # Actions: up(0)|down(1)|left(2)|right(3)
 no_actions = 4
 get_action = {0: '^', 1: 'v', 2: '<', 3: '>'}
 # Probabiistic Transition:
 alpha = 0.05
 # Discount factor: scalar in [0,1)
-gamma = 0.9
+gamma = 1
 # Goal Reward
-reward = -10
+reward = 0
 # GUI on?
-gui = True
+gui = False
 
 '''''''''''''''''''''''''''''''''''''''''
 Section 0 (Part 2)
@@ -42,7 +42,9 @@ Map Legend | (s): start | (b): block | (e): end
 # States that have obstacles
 # B = [3, 8, 10, 12, 13, 14, 17, 31, 35, 40, 49,
 #      55, 62, 84, 88]
-B = [3, 8, 10, 14, 17, 31, 35]
+B = [3, 12, 17, 31, 35]
+# B = [3]
+B = []
 
 '''''''''''''''''''''''''''''''''''''''''
 Section A (Part 3-1)
@@ -87,6 +89,13 @@ for b in B:
     if b - 1 > 0 and (b - 1) not in B:
         # Space to the left of block
         T[b - 1][b][3] = 0
+
+E = [69, 92]
+E = [33]
+E = [0, 15]
+
+# for e in E:
+#     T[e][:][:] = 0
 
 # 1-2) Probabiistic Transition
 #       complete T matrix for probabilistic transition
