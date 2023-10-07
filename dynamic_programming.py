@@ -8,7 +8,7 @@ import matplotlib
 matplotlib.use('TkAgg')
 
 # States: size of your Grid (|column| * |row|)
-elements_in_row = 4
+elements_in_row = 10
 no_states = elements_in_row ** 2
 # Actions: up(0)|down(1)|left(2)|right(3)
 no_actions = 4
@@ -16,7 +16,7 @@ get_action = {0: '^', 1: 'v', 2: '<', 3: '>'}
 # Probabiistic Transition:
 alpha = 0.05
 # Discount factor: scalar in [0,1)
-gamma = 1
+gamma = 0.9
 # Goal Reward
 reward = 0
 # GUI on?
@@ -43,7 +43,6 @@ Map Legend | (s): start | (b): block | (e): end
 # B = [3, 8, 10, 12, 13, 14, 17, 31, 35, 40, 49,
 #      55, 62, 84, 88]
 B = [3, 12, 17, 31, 35]
-# B = [3]
 B = []
 
 '''''''''''''''''''''''''''''''''''''''''
@@ -70,7 +69,7 @@ for i in range(no_states):
         # Downward movement
         # print("DOWN", i, i+10)
         T[i][i + elements_in_row][1] = 1
-    if i > elements_in_row:
+    if i > elements_in_row-1:
         # Upwrd movement
         T[i][i - elements_in_row][0] = 1
 
@@ -91,8 +90,6 @@ for b in B:
         T[b - 1][b][3] = 0
 
 E = [69, 92]
-E = [33]
-E = [0, 15]
 
 # for e in E:
 #     T[e][:][:] = 0
@@ -104,7 +101,7 @@ E = [0, 15]
 # 1-3) Reward Function: |S| x |A| array
 #       R[i][j]= reward from state i and action j
 #       each move generates -1 reward
-R = np.ones((no_states, no_actions)) * -1000
+R = np.ones((no_states, no_actions)) * -10
 #     if e - elements_in_row > 0:
 #         # Space above block
 #         T[e][e-elements_in_row][0] = 0
@@ -183,12 +180,14 @@ def policy_eval(policy, max_iter):
                     #     print(s, sp, get_action[a], T[s][sp][a])
                     if s not in E:
                         v_all += T[s][sp][a] * V_0[sp]
-                # print(s, get_action[a], v_all, R[s][a])
+                # if s == 11:
+                #     print(s, V_0[s], get_action[a], v_all, R[s][a])
                 q = R[s][a] + gamma * v_all
                 V_1[s] += policy[s][a] * q
-        diff = abs(V_1 - V_0)
+        diff = V_1 - V_0
         V_0 = np.copy(V_1)
         no_iter += 1
+        print(no_iter)
 
     return (V_0, no_iter)
 
@@ -290,7 +289,6 @@ def value_iter(in_V, max_iter):
     V_1 = np.zeros(no_states)
     while any(diff != convergance) and no_iter < max_iter:
         for s in range(no_states):
-            max_q = V_0[s]
             all_q = []
             for a in range(no_actions):
                 v_all = 0
@@ -312,9 +310,9 @@ Section C (Part 4)
 
 # 4.1.1a Random(uniform) Policy defined above
 # 4.1.1b Show the results of policy_eva
-# V, no_iter = policy_eval(P, 1000)
-# print(V)
-# print("Number of Iterations: %d" % (no_iter))
+V, no_iter = policy_eval(P, 1000)
+print(V)
+print("Number of Iterations: %d" % (no_iter))
 
 # 4.1.2 Run Policy Iteration and show the results
 # (P, V, no_iter) = policy_iter(P, 500)
@@ -322,10 +320,10 @@ Section C (Part 4)
 # print("Number of Iterations: %d" % (no_iter))
 
 # 4.1.3a Run Value Iteration and show the results
-V = np.ones(no_states) * -10000000
-(V, no_iter) = value_iter(V, 500)
-print(V)
-print("Number of Iterations: %d" % (no_iter))
+# V = np.ones(no_states) * -10000000
+# (V, no_iter) = value_iter(V, 500)
+# print(V)
+# print("Number of Iterations: %d" % (no_iter))
 
 # 4.1.3b Extract policy from V values
 P = extract_policy(V)
@@ -362,9 +360,9 @@ if gui:
             (b % elements_in_row) + 1
             ] = 5
 
-    agent_loc = 9
-    x = [3]
-    y = [2]
+    agent_loc = 0
+    x = [1]
+    y = [1]
     # agent_loc = 6
     # x = [2]
     # y = [3]
