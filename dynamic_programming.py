@@ -1,18 +1,19 @@
 
+import math
+import matplotlib.pyplot as plt
 import numpy as np
 import os
+
+from agents import MazeRunner
 from cap6635.environment.map import Map2D
 from cap6635.utilities.plot import MazeAnimator
 from cap6635.utilities.constants import (
     MOVE_UP, MOVE_DOWN, MOVE_LEFT, MOVE_RIGHT
 )
-from agents import MazeRunner
-
-import math
-import matplotlib.pyplot as plt
 
 import matplotlib
 matplotlib.use('TkAgg')
+
 
 # States: size of your Grid (|column| * |row|)
 elements_in_row = 10
