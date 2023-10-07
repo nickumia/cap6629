@@ -40,10 +40,8 @@ Map Legend | (s): start | (b): block | (e): end
 9           e
 '''''''''''''''''''''''''''''''''''''''''
 # States that have obstacles
-# B = [3, 8, 10, 12, 13, 14, 17, 31, 35, 40, 49,
-#      55, 62, 84, 88]
-B = [3, 12, 17, 31, 35]
-B = []
+B = [3, 8, 10, 12, 13, 14, 17, 31, 35, 40, 49,
+     55, 62, 84, 88]
 
 '''''''''''''''''''''''''''''''''''''''''
 Section A (Part 3-1)
@@ -74,20 +72,24 @@ for i in range(no_states):
         T[i][i - elements_in_row][0] = 1
 
 for b in B:
-    if b - elements_in_row >= 0 and (b - elements_in_row) not in B:
+    if b - elements_in_row >= 0:
         # Space above block
         # print(b-10, 'above', b)
         T[b - elements_in_row][b][1] = 0
-    if b + elements_in_row < no_states and (b + elements_in_row) not in B:
+        T[b][b - elements_in_row][0] = 0
+    if b + elements_in_row < no_states:
         # Space below block
         # print(b+10, 'below', b)
         T[b + elements_in_row][b][0] = 0
-    if b + 1 < no_states and (b + 1) not in B:
+        T[b][b + elements_in_row][1] = 0
+    if b + 1 < no_states:
         # Space to the right of block
         T[b + 1][b][2] = 0
-    if b - 1 > 0 and (b - 1) not in B:
+        T[b][b + 1][3] = 0
+    if b - 1 > 0:
         # Space to the left of block
         T[b - 1][b][3] = 0
+        T[b][b - 1][2] = 0
 
 E = [69, 92]
 
@@ -122,16 +124,20 @@ R = np.ones((no_states, no_actions)) * -10
 for i in range(no_states):
     if i % elements_in_row != 0:
         # Leftward movements
-        R[i][2] = -1
+        if i - 1 not in B:
+            R[i][2] = -1
     if (i % elements_in_row != (elements_in_row-1) and i != (no_states-1)):
         # Rightward movements
-        R[i][3] = -1
+        if i + 1 not in B:
+            R[i][3] = -1
     if i < (no_states - elements_in_row):
         # Downward movement
-        R[i][1] = -1
+        if i + elements_in_row not in B:
+            R[i][1] = -1
     if i > elements_in_row-1:
         # Upwrd movement
-        R[i][0] = -1
+        if i - elements_in_row not in B:
+            R[i][0] = -1
 for e in E:
     R[e][0] = 0
     R[e][1] = 0
@@ -310,9 +316,9 @@ Section C (Part 4)
 
 # 4.1.1a Random(uniform) Policy defined above
 # 4.1.1b Show the results of policy_eva
-V, no_iter = policy_eval(P, 1000)
-print(V)
-print("Number of Iterations: %d" % (no_iter))
+# V, no_iter = policy_eval(P, 1000)
+# print(V)
+# print("Number of Iterations: %d" % (no_iter))
 
 # 4.1.2 Run Policy Iteration and show the results
 # (P, V, no_iter) = policy_iter(P, 500)
@@ -320,10 +326,10 @@ print("Number of Iterations: %d" % (no_iter))
 # print("Number of Iterations: %d" % (no_iter))
 
 # 4.1.3a Run Value Iteration and show the results
-# V = np.ones(no_states) * -10000000
-# (V, no_iter) = value_iter(V, 500)
-# print(V)
-# print("Number of Iterations: %d" % (no_iter))
+V = np.ones(no_states) * -1000
+(V, no_iter) = value_iter(V, 500)
+print(V)
+print("Number of Iterations: %d" % (no_iter))
 
 # 4.1.3b Extract policy from V values
 P = extract_policy(V)
@@ -340,6 +346,8 @@ for i, s in enumerate(P):
     x = (math.floor(i / elements_in_row)) + 1
     if i in E:
         plt.text(y, x, "x", color='green')
+    elif i in B:
+        plt.text(y, x, "o", color='green')
     else:
         plt.text(y, x, get_action[action], color='green')
     plt.imshow(policy.map, 'pink')
