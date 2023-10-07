@@ -5,6 +5,7 @@ import numpy as np
 import os
 
 from agents import MazeRunner
+import transition_probability
 from cap6635.environment.map import Map2D
 from cap6635.utilities.plot import MazeAnimator
 from cap6635.utilities.constants import (
@@ -21,8 +22,6 @@ no_states = elements_in_row ** 2
 # Actions: up(0)|down(1)|left(2)|right(3)
 no_actions = 4
 get_action = {MOVE_UP: '^', MOVE_DOWN: 'v', MOVE_LEFT: '<', MOVE_RIGHT: '>'}
-# Probabiistic Transition:
-alpha = 0.05
 # Discount factor: scalar in [0,1)
 gamma = 0.9
 # Goal Reward
@@ -61,63 +60,11 @@ R = np.ones((no_states, no_actions)) * state_reward * 10
 for e in E:
     R[e][:] = state_reward
 
-'''''''''''''''''''''''''''''''''''''''''
-Section A (Part 3-1)
-'''''''''''''''''''''''''''''''''''''''''
-# Transition probability is |S| x |S'| x |A| array
-# T[i][j][k]= prob. moving from state i to j when doing action k
-# moving out of boundary or to block stays in current state
 
-# 1-1) Deterministic Transition
-#       agent moves to its intented next state with prob=1.0
-#       complete T matrix for deterministic transition
-T = np.zeros((no_states, no_states, no_actions))
-
-for i in range(no_states):
-    if i % elements_in_row != 0:
-        # print("LEFT", i, i-1)
-        T[i][i-1][MOVE_LEFT] = 1
-        if i - 1 not in B:
-            R[i][MOVE_LEFT] = state_reward
-    if (i % elements_in_row != (elements_in_row-1) and i != (no_states-1)):
-        # print('RIGHT', i, i+1)
-        T[i][i+1][MOVE_RIGHT] = 1
-        if i + 1 not in B:
-            R[i][MOVE_RIGHT] = state_reward
-    if i < (no_states - elements_in_row):
-        # print("DOWN", i, i+10)
-        T[i][i + elements_in_row][MOVE_DOWN] = 1
-        if i + elements_in_row not in B:
-            R[i][MOVE_DOWN] = state_reward
-    if i > elements_in_row-1:
-        T[i][i - elements_in_row][MOVE_UP] = 1
-        if i - elements_in_row not in B:
-            R[i][MOVE_UP] = state_reward
-
-for b in B:
-    if b - elements_in_row >= 0:
-        # Space above block
-        # print(b-10, 'above', b)
-        T[b - elements_in_row][b][MOVE_DOWN] = 0
-        T[b][b - elements_in_row][MOVE_UP] = 0
-    if b + elements_in_row < no_states:
-        # Space below block
-        # print(b+10, 'below', b)
-        T[b + elements_in_row][b][MOVE_UP] = 0
-        T[b][b + elements_in_row][MOVE_DOWN] = 0
-    if b + 1 < no_states:
-        # Space to the right of block
-        T[b + 1][b][MOVE_LEFT] = 0
-        T[b][b + 1][MOVE_RIGHT] = 0
-    if b - 1 > 0:
-        # Space to the left of block
-        T[b - 1][b][MOVE_RIGHT] = 0
-        T[b][b - 1][MOVE_LEFT] = 0
-
-
-# 1-2) Probabiistic Transition
-#       complete T matrix for probabilistic transition
-T = T * (1 - no_actions * alpha)
+# Deterministic Transition
+T = transition_probability.generate(no_states, no_actions, state_reward,
+                                    elements_in_row, B=B, R=R,
+                                    deterministic=False)
 
 
 '''''''''''''''''''''''''''''''''''''''''
