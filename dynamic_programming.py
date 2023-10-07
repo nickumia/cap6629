@@ -42,6 +42,15 @@ Map Legend | (s): start | (b): block | (e): end
 # States that have obstacles
 B = [3, 8, 10, 12, 13, 14, 17, 31, 35, 40, 49,
      55, 62, 84, 88]
+# Final States
+E = [69, 92]
+
+# 1-3) Reward Function: |S| x |A| array
+#       R[i][j]= reward from state i and action j
+#       each move generates -1 reward
+R = np.ones((no_states, no_actions)) * -10
+for e in E:
+    R[e][:] = 0
 
 '''''''''''''''''''''''''''''''''''''''''
 Section A (Part 3-1)
@@ -54,22 +63,31 @@ Section A (Part 3-1)
 #       agent moves to its intented next state with prob=1.0
 #       complete T matrix for deterministic transition
 T = np.zeros((no_states, no_states, no_actions))
+
 for i in range(no_states):
     if i % elements_in_row != 0:
         # Leftward movements
         # print("LEFT", i, i-1)
         T[i][i-1][2] = 1
+        if i - 1 not in B:
+            R[i][2] = -1
     if (i % elements_in_row != (elements_in_row-1) and i != (no_states-1)):
         # Rightward movements
         # print('RIGHT', i, i+1)
         T[i][i+1][3] = 1
+        if i + 1 not in B:
+            R[i][3] = -1
     if i < (no_states - elements_in_row):
         # Downward movement
         # print("DOWN", i, i+10)
         T[i][i + elements_in_row][1] = 1
+        if i + elements_in_row not in B:
+            R[i][1] = -1
     if i > elements_in_row-1:
         # Upwrd movement
         T[i][i - elements_in_row][0] = 1
+        if i - elements_in_row not in B:
+            R[i][0] = -1
 
 for b in B:
     if b - elements_in_row >= 0:
@@ -91,58 +109,10 @@ for b in B:
         T[b - 1][b][3] = 0
         T[b][b - 1][2] = 0
 
-E = [69, 92]
-
-# for e in E:
-#     T[e][:][:] = 0
 
 # 1-2) Probabiistic Transition
 #       complete T matrix for probabilistic transition
-# T = T * (1 - no_actions * alpha)
-
-# 1-3) Reward Function: |S| x |A| array
-#       R[i][j]= reward from state i and action j
-#       each move generates -1 reward
-R = np.ones((no_states, no_actions)) * -10
-#     if e - elements_in_row > 0:
-#         # Space above block
-#         T[e][e-elements_in_row][0] = 0
-#         # R[e - elements_in_row][1] = reward
-#     if e + elements_in_row < no_states:
-#         # Space below block
-#         T[e][e+elements_in_row][1] = 0
-#         # R[e + elements_in_row][0] = reward
-#     if e + 1 < no_states:
-#         # Space to the right of block
-#         T[e][e+1][3] = 0
-#         # R[e + 1][3] = reward
-#     if e - 1 > 0:
-#         # Space to the left of block
-#         T[e][e-1][2] = 0
-#         # R[e - 1][2] = reward
-
-for i in range(no_states):
-    if i % elements_in_row != 0:
-        # Leftward movements
-        if i - 1 not in B:
-            R[i][2] = -1
-    if (i % elements_in_row != (elements_in_row-1) and i != (no_states-1)):
-        # Rightward movements
-        if i + 1 not in B:
-            R[i][3] = -1
-    if i < (no_states - elements_in_row):
-        # Downward movement
-        if i + elements_in_row not in B:
-            R[i][1] = -1
-    if i > elements_in_row-1:
-        # Upwrd movement
-        if i - elements_in_row not in B:
-            R[i][0] = -1
-for e in E:
-    R[e][0] = 0
-    R[e][1] = 0
-    R[e][3] = 0
-    R[e][2] = 0
+T = T * (1 - no_actions * alpha)
 
 
 '''''''''''''''''''''''''''''''''''''''''
