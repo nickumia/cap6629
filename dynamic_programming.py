@@ -345,7 +345,10 @@ for i, s in enumerate(P):
     action = np.where(s == 1)[0][0]
     y = (i % elements_in_row) + 1
     x = (math.floor(i / elements_in_row)) + 1
-    plt.text(y, x, get_action[action], color='green')
+    if i in E:
+        plt.text(y, x, "x", color='green')
+    else:
+        plt.text(y, x, get_action[action], color='green')
     plt.imshow(policy.map, 'pink')
 plt.savefig('policy.png')
 plt.clf()
