@@ -286,11 +286,12 @@ def value_iter(in_V, max_iter):
     # Initialization V using np.zeros
     # V = np.zeros(no_states)
     V_0 = in_V
+    convergance = np.zeros(no_states)
     no_iter = 0
-    changed = no_states
-    while changed != 0 and no_iter < max_iter:
+
+    diff = np.ones(no_states)
+    while any(diff != convergance) and no_iter < max_iter:
         V_1 = np.zeros(no_states)
-        changed = 0
         for s in range(no_states):
             max_q = V_0[s]
             for a in range(no_actions):
@@ -299,13 +300,15 @@ def value_iter(in_V, max_iter):
                     v_all += T[s][sp][a] * V_0[sp]
                 q = R[s][a] + gamma * v_all
                 V_1[s] = q
-            if abs(q) > abs(max_q):
-                max_q = q
-                changed += 1
-            V_0[s] = q
+                if abs(q) > abs(max_q):
+                    max_q = q
+                    V_1[s] = q
+        diff = abs(V_1 - V_0)
+        no_iter += 1
+        V_0 = np.copy(V_1)
         no_iter += 1
 
-    return [V, no_iter]
+    return [V_1, no_iter]
 
 
 '''''''''''''''''''''''''''''''''''''''''
