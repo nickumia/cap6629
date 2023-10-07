@@ -1,6 +1,13 @@
 
 import numpy as np
+import os
 from cap6635.environment.map import Map2D
+from cap6635.utilities.plot import MazeAnimator
+from cap6635.utilities.constants import (
+    MOVE_UP, MOVE_DOWN, MOVE_LEFT, MOVE_RIGHT
+)
+from agents import MazeRunner
+
 import math
 import matplotlib.pyplot as plt
 
@@ -12,7 +19,7 @@ elements_in_row = 10
 no_states = elements_in_row ** 2
 # Actions: up(0)|down(1)|left(2)|right(3)
 no_actions = 4
-get_action = {0: '^', 1: 'v', 2: '<', 3: '>'}
+get_action = {MOVE_UP: '^', MOVE_DOWN: 'v', MOVE_LEFT: '<', MOVE_RIGHT: '>'}
 # Probabiistic Transition:
 alpha = 0.05
 # Discount factor: scalar in [0,1)
@@ -66,48 +73,44 @@ T = np.zeros((no_states, no_states, no_actions))
 
 for i in range(no_states):
     if i % elements_in_row != 0:
-        # Leftward movements
         # print("LEFT", i, i-1)
-        T[i][i-1][2] = 1
+        T[i][i-1][MOVE_LEFT] = 1
         if i - 1 not in B:
-            R[i][2] = -1
+            R[i][MOVE_LEFT] = -1
     if (i % elements_in_row != (elements_in_row-1) and i != (no_states-1)):
-        # Rightward movements
         # print('RIGHT', i, i+1)
-        T[i][i+1][3] = 1
+        T[i][i+1][MOVE_RIGHT] = 1
         if i + 1 not in B:
-            R[i][3] = -1
+            R[i][MOVE_RIGHT] = -1
     if i < (no_states - elements_in_row):
-        # Downward movement
         # print("DOWN", i, i+10)
-        T[i][i + elements_in_row][1] = 1
+        T[i][i + elements_in_row][MOVE_DOWN] = 1
         if i + elements_in_row not in B:
-            R[i][1] = -1
+            R[i][MOVE_DOWN] = -1
     if i > elements_in_row-1:
-        # Upwrd movement
-        T[i][i - elements_in_row][0] = 1
+        T[i][i - elements_in_row][MOVE_UP] = 1
         if i - elements_in_row not in B:
-            R[i][0] = -1
+            R[i][MOVE_UP] = -1
 
 for b in B:
     if b - elements_in_row >= 0:
         # Space above block
         # print(b-10, 'above', b)
-        T[b - elements_in_row][b][1] = 0
-        T[b][b - elements_in_row][0] = 0
+        T[b - elements_in_row][b][MOVE_DOWN] = 0
+        T[b][b - elements_in_row][MOVE_UP] = 0
     if b + elements_in_row < no_states:
         # Space below block
         # print(b+10, 'below', b)
-        T[b + elements_in_row][b][0] = 0
-        T[b][b + elements_in_row][1] = 0
+        T[b + elements_in_row][b][MOVE_UP] = 0
+        T[b][b + elements_in_row][MOVE_DOWN] = 0
     if b + 1 < no_states:
         # Space to the right of block
-        T[b + 1][b][2] = 0
-        T[b][b + 1][3] = 0
+        T[b + 1][b][MOVE_LEFT] = 0
+        T[b][b + 1][MOVE_RIGHT] = 0
     if b - 1 > 0:
         # Space to the left of block
-        T[b - 1][b][3] = 0
-        T[b][b - 1][2] = 0
+        T[b - 1][b][MOVE_RIGHT] = 0
+        T[b][b - 1][MOVE_LEFT] = 0
 
 
 # 1-2) Probabiistic Transition
@@ -329,34 +332,20 @@ if gui:
             (b % elements_in_row) + 1
             ] = 5
 
-    agent_loc = 0
-    x = [1]
-    y = [1]
-    # agent_loc = 6
-    # x = [2]
-    # y = [3]
-    while agent_loc not in E:
+    a = MazeRunner(maze, P, state=0, start=(1, 1),
+                   elements_in_row=elements_in_row)
+    animator = MazeAnimator(os.getcwd(), '/maze.gif')
+    animator.temp = '/temp/'
+    animator.save_state(i, maze, a)
+    i = 0
+    while a.state not in E:
         # Starting position
-        maze.map[x[0]][y[0]] = 30
-        # Actions: up(0)|down(1)|left(2)|right(3)
-        maze.map[x[-1], y[-1]] = 10
-        action = np.where(P[agent_loc] == 1)[0][0]
-        if action == 0:
-            agent_loc -= elements_in_row
-        elif action == 1:
-            agent_loc += elements_in_row
-        elif action == 2:
-            agent_loc -= 1
-        elif action == 3:
-            agent_loc += 1
-        y.append((agent_loc % elements_in_row) + 1)
-        x.append((math.floor(agent_loc / elements_in_row)) + 1)
-        # label = "Time Elapsed:%d; Utility: %.1f" % (i, 0)
-        # plt.text(0, 0, label)
-        plt.imshow(maze.map, 'pink')
-        plt.ion()
-        plt.show()
-        plt.pause(0.3)
-        plt.plot(y, x, 'r:', linewidth=1)
-        plt.plot(y[-1], x[-1], '*r', 'Maze Runner', 5)
-        maze.map[x[-2], y[-2]] = 0
+        a.move()
+        maze.map[a._x_path[0], a._y_path[0]] = 30
+        maze.map[a._x_path[-1], a._y_path[-1]] = 10
+        maze.map[a._x_path[-2], a._y_path[-2]] = 0
+        animator.save_state(i, maze, a)
+        i += 1
+
+    animator.make_gif()
+    del animator.temp
