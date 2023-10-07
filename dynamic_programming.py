@@ -104,23 +104,44 @@ E = [0, 15]
 # 1-3) Reward Function: |S| x |A| array
 #       R[i][j]= reward from state i and action j
 #       each move generates -1 reward
-R = np.ones((no_states, no_actions)) * -1
-E = [69, 92]
-E = [30]
-for e in E:
-    if e - elements_in_row > 0:
-        # Space above block
-        R[e - elements_in_row][1] = reward
-    if e + elements_in_row < no_states:
-        # Space below block
-        R[e + elements_in_row][0] = reward
-    if e + 1 < no_states:
-        # Space to the right of block
-        R[e + 1][3] = reward
-    if e - 1 > 0:
-        # Space to the left of block
-        R[e - 1][2] = reward
+R = np.ones((no_states, no_actions)) * -1000
+#     if e - elements_in_row > 0:
+#         # Space above block
+#         T[e][e-elements_in_row][0] = 0
+#         # R[e - elements_in_row][1] = reward
+#     if e + elements_in_row < no_states:
+#         # Space below block
+#         T[e][e+elements_in_row][1] = 0
+#         # R[e + elements_in_row][0] = reward
+#     if e + 1 < no_states:
+#         # Space to the right of block
+#         T[e][e+1][3] = 0
+#         # R[e + 1][3] = reward
+#     if e - 1 > 0:
+#         # Space to the left of block
+#         T[e][e-1][2] = 0
+#         # R[e - 1][2] = reward
 
+for i in range(no_states):
+    if i % elements_in_row != 0:
+        # Leftward movements
+        R[i][2] = -1
+    if (i % elements_in_row != (elements_in_row-1) and i != (no_states-1)):
+        # Rightward movements
+        R[i][3] = -1
+    if i < (no_states - elements_in_row):
+        # Downward movement
+        R[i][1] = -1
+    if i > elements_in_row-1:
+        # Upwrd movement
+        R[i][0] = -1
+for e in E:
+    R[e][0] = 0
+    R[e][1] = 0
+    R[e][3] = 0
+    R[e][2] = 0
+
+print(R)
 
 '''''''''''''''''''''''''''''''''''''''''
 Section B (Part 3-2)
