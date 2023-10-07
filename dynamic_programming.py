@@ -179,11 +179,18 @@ def policy_eval(policy, max_iter):
             for s in range(no_states):
                 v_all = 0
                 for sp in range(no_states):
-                    v_all += T[s][sp][a] * V_0[sp]
+                    # This should only return valid moves
+                    # if T[s][sp][a] == 1:
+                    #     print(s, sp, get_action[a], T[s][sp][a])
+                    if s not in E:
+                        v_all += T[s][sp][a] * V_0[sp]
+                # print(s, get_action[a], v_all, R[s][a])
                 q = R[s][a] + gamma * v_all
                 V_1[s] += policy[s][a] * q
         diff = abs(V_1 - V_0)
         V_0 = np.copy(V_1)
+        print(V_0)
+        # import time; time.sleep(0.2)
         no_iter += 1
 
     return (V_0, no_iter)
