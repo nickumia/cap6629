@@ -138,7 +138,6 @@ def policy_eval(policy, max_iter):
     Ouput:
     V -- Value function: array of |S| entries
     '''
-
     # V value begins with 0
     V_0 = np.zeros(no_states)
     convergance = np.zeros(no_states)
@@ -156,8 +155,6 @@ def policy_eval(policy, max_iter):
                     #     print(s, sp, get_action[a], T[s][sp][a])
                     if s not in E:
                         v_all += T[s][sp][a] * V_0[sp]
-                # if s == 11:
-                #     print(s, V_0[s], get_action[a], v_all, R[s][a])
                 q = R[s][a] + gamma * v_all
                 V_1[s] += policy[s][a] * q
         diff = V_1 - V_0
@@ -182,8 +179,8 @@ def extract_policy(V):
     Output:
     policy -- Policy array P
     '''
-
     # initialize random(uniform) policy
+    # P = np.ones((no_states, no_actions)) * (1 / no_actions)
     P = np.zeros((no_states, no_actions))
 
     for s in range(no_states):
@@ -219,9 +216,6 @@ def policy_iter(in_policy, max_iter):
     V -- Value function: array of |S| entries
     no_iter -- the actual # of iterations peformed by policy iteration: scalar
     '''
-
-    # Initialization P and V using np.zeros
-    # P = np.zeros((no_states, no_actions))
     P = in_policy
     V_0 = np.zeros(no_states)
     convergance = np.zeros(no_states)
@@ -254,9 +248,6 @@ def value_iter(in_V, max_iter):
     V -- Value function: array of |S| entries
     no_iter -- the actual # of iterations peformed by policy iteration: scalar
     '''
-
-    # Initialization V using np.zeros
-    # V = np.zeros(no_states)
     V_0 = in_V
     convergance = np.zeros(no_states)
     no_iter = 0
@@ -285,7 +276,7 @@ Section C (Part 4)
 '''''''''''''''''''''''''''''''''''''''''
 
 # 4.1.1a Random(uniform) Policy defined above
-# 4.1.1b Show the results of policy_eva
+# 4.1.1b Show the results of policy_eval
 # V, no_iter = policy_eval(P, 1000)
 # print(V)
 # print("Number of Iterations: %d" % (no_iter))
