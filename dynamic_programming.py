@@ -25,7 +25,8 @@ alpha = 0.05
 # Discount factor: scalar in [0,1)
 gamma = 0.9
 # Goal Reward
-reward = 0
+goal_reward = 0
+state_reward = -1
 # GUI on?
 gui = True
 
@@ -55,9 +56,9 @@ E = [69, 92]
 # 1-3) Reward Function: |S| x |A| array
 #       R[i][j]= reward from state i and action j
 #       each move generates -1 reward
-R = np.ones((no_states, no_actions)) * -10
+R = np.ones((no_states, no_actions)) * goal_reward
 for e in E:
-    R[e][:] = 0
+    R[e][:] = state_reward
 
 '''''''''''''''''''''''''''''''''''''''''
 Section A (Part 3-1)
@@ -76,21 +77,21 @@ for i in range(no_states):
         # print("LEFT", i, i-1)
         T[i][i-1][MOVE_LEFT] = 1
         if i - 1 not in B:
-            R[i][MOVE_LEFT] = -1
+            R[i][MOVE_LEFT] = state_reward
     if (i % elements_in_row != (elements_in_row-1) and i != (no_states-1)):
         # print('RIGHT', i, i+1)
         T[i][i+1][MOVE_RIGHT] = 1
         if i + 1 not in B:
-            R[i][MOVE_RIGHT] = -1
+            R[i][MOVE_RIGHT] = state_reward
     if i < (no_states - elements_in_row):
         # print("DOWN", i, i+10)
         T[i][i + elements_in_row][MOVE_DOWN] = 1
         if i + elements_in_row not in B:
-            R[i][MOVE_DOWN] = -1
+            R[i][MOVE_DOWN] = state_reward
     if i > elements_in_row-1:
         T[i][i - elements_in_row][MOVE_UP] = 1
         if i - elements_in_row not in B:
-            R[i][MOVE_UP] = -1
+            R[i][MOVE_UP] = state_reward
 
 for b in B:
     if b - elements_in_row >= 0:
@@ -163,7 +164,6 @@ def policy_eval(policy, max_iter):
         diff = V_1 - V_0
         V_0 = np.copy(V_1)
         no_iter += 1
-        print(no_iter)
 
     return (V_0, no_iter)
 
@@ -188,6 +188,7 @@ def extract_policy(V):
 
     for s in range(no_states):
         best_action = 0
+        # TODO: Choose a better absolute worst q
         max_q = -100000000
         for i, a in enumerate(range(no_actions)):
             v = 0
