@@ -141,7 +141,6 @@ for e in E:
     R[e][3] = 0
     R[e][2] = 0
 
-print(R)
 
 '''''''''''''''''''''''''''''''''''''''''
 Section B (Part 3-2)
@@ -189,8 +188,6 @@ def policy_eval(policy, max_iter):
                 V_1[s] += policy[s][a] * q
         diff = abs(V_1 - V_0)
         V_0 = np.copy(V_1)
-        print(V_0)
-        # import time; time.sleep(0.2)
         no_iter += 1
 
     return (V_0, no_iter)
