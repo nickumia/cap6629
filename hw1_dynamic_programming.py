@@ -281,7 +281,7 @@ if gui:
             (b % elements_in_row) + 1
             ] = 5
 
-    a = MazeRunner(maze, P, state=0, start=(1, 1),
+    a = MazeRunner(maze, P, state=40, start=(4, 1),
                    elements_in_row=elements_in_row)
     animator = MazeAnimator(os.getcwd(), '/maze.gif')
     animator.temp = '/temp/'
