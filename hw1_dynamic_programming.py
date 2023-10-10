@@ -64,7 +64,7 @@ for e in E:
 # Deterministic Transition
 T = transition_probability.generate(no_states, no_actions, state_reward,
                                     elements_in_row, B=B, R=R,
-                                    deterministic=False)
+                                    deterministic=True)
 
 
 '''''''''''''''''''''''''''''''''''''''''
