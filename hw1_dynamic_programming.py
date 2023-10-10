@@ -12,8 +12,8 @@ from cap6635.utilities.constants import (
     MOVE_UP, MOVE_DOWN, MOVE_LEFT, MOVE_RIGHT
 )
 
-import matplotlib
-matplotlib.use('TkAgg')
+# import matplotlib
+# matplotlib.use('TkAgg')
 
 
 # States: size of your Grid (|column| * |row|)
