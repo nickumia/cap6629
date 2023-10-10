@@ -13,7 +13,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
       - name: Install
-        run: pip install -r requirements-dev.txt
+        run: pip install coverage flake8 pytest
       - name: Lint
         run: make lint
 
@@ -28,7 +28,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
       - name: Install
-        run: pip install -r requirements.txt
+        run: pip install cap6635
       - name: Clean
         run: python hw1_dynamic_programming.py
       - name: Animation Output
