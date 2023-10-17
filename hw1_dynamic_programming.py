@@ -58,7 +58,7 @@ E = [69, 92]
 #       each move generates -1 reward
 R = np.ones((no_states, no_actions)) * state_reward * 10
 for e in E:
-    R[e][:] = state_reward
+    R[e][:] = goal_reward
 
 
 # Deterministic Transition
