@@ -57,14 +57,14 @@ E = [69, 92]
 #       R[i][j]= reward from state i and action j
 #       each move generates -1 reward
 R = np.ones((no_states, no_actions)) * state_reward * 10
-for e in E:
-    R[e][:] = goal_reward
 
 
 # Deterministic Transition
 T = transition_probability.generate(no_states, no_actions, state_reward,
                                     elements_in_row, B=B, R=R,
-                                    deterministic=True)
+                                    deterministic=False)
+for e in E:
+    R[e][:] = goal_reward
 
 
 '''''''''''''''''''''''''''''''''''''''''
@@ -266,6 +266,8 @@ for i, s in enumerate(P):
     plt.imshow(policy.map, 'pink')
 plt.savefig('policy.png')
 plt.clf()
+
+print('Animating...')
 
 
 if gui:
