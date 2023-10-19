@@ -7,7 +7,7 @@ from cap6635.utilities.constants import (
 )
 
 # Probabiistic Transition:
-alpha = 0.005
+alpha = 0.0225
 
 
 '''''''''''''''''''''''''''''''''''''''''
