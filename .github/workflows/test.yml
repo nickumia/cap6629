@@ -1,0 +1,41 @@
+---
+name: Example Program Tests
+
+on:
+  push:
+
+
+jobs:
+  pylint:
+    name: Python lint
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Install
+        run: pip install coverage flake8 pytest
+      - name: Lint
+        run: make lint
+
+  dynamic_programming:
+    name: Maze Runner (dynamic programming)
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        agent_type: [1]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Install
+        run: pip install cap6635
+      - name: Clean
+        run: python hw1_dynamic_programming.py
+      - name: Animation Output
+        uses: actions/upload-artifact@v3
+        if: always()
+        with:
+          name: maze
+          path: |
+            ./maze.gif
+            ./policy.png
