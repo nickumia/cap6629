@@ -17,7 +17,10 @@ from cap6635.utilities.constants import (
 
 
 # States: size of your Grid (|column| * |row|)
-elements_in_row = 10
+try:
+    elements_in_row = int(input('Enter the number of elements in a row:'))
+except ValueError:
+    elements_in_row = 10
 no_states = elements_in_row ** 2
 # Actions: up(0)|down(1)|left(2)|right(3)
 no_actions = 4
@@ -27,8 +30,27 @@ gamma = 0.9
 # Goal Reward
 goal_reward = 0
 state_reward = -1
-# GUI on?
-gui = True
+
+deterministic = input('Are transitions deterministic? (y/n)')
+if deterministic == 'n':
+    deterministic = False
+else:
+    deterministic = True
+
+gui = input('Should a simulation be run? (y/n)')
+if gui == 'n':
+    gui = False
+else:
+    gui = True
+    try:
+        start_pos = int(input('What is the starting state? '))
+    except ValueError:
+        start_pos = 0
+
+algo = input('Specify the algorithm to run:\n'
+             '(v) Value Iteration\n'
+             '(p) Policy Iteration\n'
+             '(e) Policy Evaluation\n')
 
 '''''''''''''''''''''''''''''''''''''''''
 Section 0 (Part 2)
@@ -229,24 +251,29 @@ Section C (Part 4)
 
 # 4.1.1a Random(uniform) Policy defined above
 # 4.1.1b Show the results of policy_eval
-# V, no_iter = policy_eval(P, 1000)
-# print(V)
-# print("Number of Iterations: %d" % (no_iter))
+if algo.lower() == 'e':
+    V, no_iter = policy_eval(P, 1000)
+    print(V)
+    # 4.1.3b Extract policy from V values
+    P = extract_policy(V)
+    print(P)
 
 # 4.1.2 Run Policy Iteration and show the results
-# (P, V, no_iter) = policy_iter(P, 500)
-# print(V)
-# print("Number of Iterations: %d" % (no_iter))
+if algo.lower() == 'p':
+    (P, V, no_iter) = policy_iter(P, 500)
+    print(V)
+    print(P)
 
 # 4.1.3a Run Value Iteration and show the results
-V = np.ones(no_states) * -1000
-(V, no_iter) = value_iter(V, 500)
-print(V)
-print("Number of Iterations: %d" % (no_iter))
+if algo.lower() == 'v':
+    V = np.ones(no_states) * -1000
+    (V, no_iter) = value_iter(V, 500)
+    print(V)
+    # 4.1.3b Extract policy from V values
+    P = extract_policy(V)
+    print(P)
 
-# 4.1.3b Extract policy from V values
-P = extract_policy(V)
-print(P)
+print("Number of Iterations: %d" % (no_iter))
 
 
 '''''''''''''''''''''''''''''''''''''''''
@@ -283,7 +310,9 @@ if gui:
             (b % elements_in_row) + 1
             ] = 5
 
-    a = MazeRunner(maze, P, state=40, start=(4, 1),
+    sx = math.floor(start_pos / elements_in_row) + 1
+    sy = math.floor(start_pos % elements_in_row) + 1
+    a = MazeRunner(maze, P, state=start_pos, start=(sx, sy),
                    elements_in_row=elements_in_row)
     animator = MazeAnimator(os.getcwd(), '/maze.gif')
     animator.temp = '/temp/'
