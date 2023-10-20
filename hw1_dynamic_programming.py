@@ -3,6 +3,7 @@ import math
 import matplotlib.pyplot as plt
 import numpy as np
 import os
+import sys
 
 from agents import MazeRunner
 import transition_probability
@@ -16,12 +17,23 @@ from cap6635.utilities.constants import (
 # matplotlib.use('TkAgg')
 
 
+usage = ('Usage:\n'
+         'python3 hw1_dynamic_programming.py <elements_in_row> <algorithm>\n'
+         '     <deterministic(y/n)> <simulation(y/n)> [starting_state]\n\n'
+         'algorithms to choose from:\n'
+         '(v) Value Iteration\n'
+         '(p) Policy Iteration\n'
+         '(e) Policy Evaluation\n')
+
 # States: size of your Grid (|column| * |row|)
 try:
-    elements_in_row = int(input('Enter the number of elements in a row:'))
+    elements_in_row = int(sys.argv[1])
 except ValueError:
     elements_in_row = 10
+except IndexError:
+    elements_in_row = 10
 no_states = elements_in_row ** 2
+
 # Actions: up(0)|down(1)|left(2)|right(3)
 no_actions = 4
 get_action = {MOVE_UP: '^', MOVE_DOWN: 'v', MOVE_LEFT: '<', MOVE_RIGHT: '>'}
@@ -31,26 +43,31 @@ gamma = 0.9
 goal_reward = 0
 state_reward = -1
 
-deterministic = input('Are transitions deterministic? (y/n)')
-if deterministic == 'n':
-    deterministic = False
-else:
-    deterministic = True
+try:
+    algo = sys.argv[2]
+except IndexError:
+    algo = 'v'
+try:
+    if sys.argv[3] == 'n':
+        deterministic = False
+    else:
+        deterministic = True
+except BaseException:
+    print(usage)
+    sys.exit(1)
 
-gui = input('Should a simulation be run? (y/n)')
-if gui == 'n':
-    gui = False
-else:
-    gui = True
-    try:
-        start_pos = int(input('What is the starting state? '))
-    except ValueError:
-        start_pos = 0
-
-algo = input('Specify the algorithm to run:\n'
-             '(v) Value Iteration\n'
-             '(p) Policy Iteration\n'
-             '(e) Policy Evaluation\n')
+try:
+    if sys.argv[4] == 'n':
+        gui = False
+    else:
+        gui = True
+        try:
+            start_pos = int(sys.argv[5])
+        except ValueError:
+            start_pos = 0
+except BaseException:
+    print(usage)
+    sys.exit(1)
 
 '''''''''''''''''''''''''''''''''''''''''
 Section 0 (Part 2)
