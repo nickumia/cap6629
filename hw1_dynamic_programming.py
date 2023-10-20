@@ -308,7 +308,7 @@ for i, s in enumerate(P):
     else:
         plt.text(y, x, get_action[action], color='green')
     plt.imshow(policy.map, 'pink')
-plt.savefig('policy.png')
+plt.savefig('policy_%s_%s_%s.png' % (elements_in_row, algo, deterministic))
 plt.clf()
 
 print('Animating...')
@@ -331,7 +331,9 @@ if gui:
     sy = math.floor(start_pos % elements_in_row) + 1
     a = MazeRunner(maze, P, state=start_pos, start=(sx, sy),
                    elements_in_row=elements_in_row)
-    animator = MazeAnimator(os.getcwd(), '/maze.gif')
+    maze_name = '/maze_%s_%s_%s_%s.gif' % (elements_in_row, algo,
+                                           deterministic, start_pos)
+    animator = MazeAnimator(os.getcwd(), maze_name)
     animator.temp = '/temp/'
     animator.save_state(i, maze, a)
     i = 0
