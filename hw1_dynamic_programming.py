@@ -87,10 +87,10 @@ Map Legend | (s): start | (b): block | (e): end
 9           e
 '''''''''''''''''''''''''''''''''''''''''
 # States that have obstacles
-B = [3, 8, 10, 12, 13, 14, 17, 31, 35, 40, 49,
-     55, 62, 84, 88]
+B = [8, 14, 20, 31, 32, 33]
+
 # Final States
-E = [69, 92]
+E = [15, 18]
 
 # 1-3) Reward Function: |S| x |A| array
 #       R[i][j]= reward from state i and action j
