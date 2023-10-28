@@ -30,7 +30,7 @@ def generate(no_states, no_actions, state_reward, elements_in_row, B=[], R=[],
     T = np.zeros((no_states, no_states, no_actions))
 
     for i in range(no_states):
-        if i % elements_in_row != 0:
+        if (i % elements_in_row != 0 and i != 0):
             # print("LEFT", i, i-1)
             if deterministic:
                 T[i][i-1][MOVE_LEFT] = 1
