@@ -59,7 +59,7 @@ def generate(no_states, no_actions, state_reward, elements_in_row, B=[], R=[],
             if i + 1 not in B:
                 R[i][MOVE_RIGHT] = state_reward
         if i < (no_states - elements_in_row):
-            # print("DOWN", i, i+10)
+            # print("DOWN", i, i+elements_in_row)
             if deterministic:
                 T[i][i + elements_in_row][MOVE_DOWN] = 1
             else:

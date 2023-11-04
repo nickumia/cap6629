@@ -101,7 +101,8 @@ R = np.ones((no_states, no_actions)) * state_reward * 10
 # Deterministic Transition
 T = transition_probability.generate(no_states, no_actions, state_reward,
                                     elements_in_row, B=B, R=R,
-                                    deterministic=False)
+                                    deterministic=deterministic)
+
 for e in E:
     R[e][:] = goal_reward
 
