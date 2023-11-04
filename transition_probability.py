@@ -38,7 +38,7 @@ def generate(no_states, no_actions, state_reward, elements_in_row, B=[], R=[],
                 T[i][i-1][MOVE_LEFT] = (1 - no_actions * alpha)
                 for slippery in [i, i-2, i-1-elements_in_row,
                                  i-1+elements_in_row]:
-                    if slippery not in B:
+                    if slippery not in B and i not in B:
                         if is_valid(i, slippery,
                                     elements_in_row, no_states, relaxed=True):
                             T[i][slippery][MOVE_LEFT] = alpha
@@ -52,7 +52,7 @@ def generate(no_states, no_actions, state_reward, elements_in_row, B=[], R=[],
                 T[i][i+1][MOVE_RIGHT] = (1 - no_actions * alpha)
                 for slippery in [i, i+2, i+1-elements_in_row,
                                  i+1+elements_in_row]:
-                    if slippery not in B:
+                    if slippery not in B and i not in B:
                         if is_valid(i, slippery,
                                     elements_in_row, no_states, relaxed=True):
                             T[i][slippery][MOVE_RIGHT] = alpha
@@ -67,7 +67,7 @@ def generate(no_states, no_actions, state_reward, elements_in_row, B=[], R=[],
                 for slippery in [i, i+elements_in_row+1,
                                  i+elements_in_row+elements_in_row,
                                  i+elements_in_row-1]:
-                    if slippery not in B:
+                    if slippery not in B and i not in B:
                         if is_valid(i, slippery,
                                     elements_in_row, no_states, relaxed=True):
                             T[i][slippery][MOVE_DOWN] = alpha
@@ -81,7 +81,7 @@ def generate(no_states, no_actions, state_reward, elements_in_row, B=[], R=[],
                 for slippery in [i, i-elements_in_row+1,
                                  i-elements_in_row-elements_in_row,
                                  i-elements_in_row-1]:
-                    if slippery not in B:
+                    if slippery not in B and i not in B:
                         if is_valid(i, slippery,
                                     elements_in_row, no_states, relaxed=True):
                             T[i][slippery][MOVE_UP] = alpha
