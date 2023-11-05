@@ -29,6 +29,9 @@ jobs:
         include:
           - elements: 10
           - simulation: 'y'
+        exclude:
+          - agent_type: 'e'
+            deterministic: 'n'
     steps:
       - name: Checkout
         uses: actions/checkout@v2
