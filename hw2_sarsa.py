@@ -91,21 +91,13 @@ env = GridEnv(no_states, no_actions)
 
 def extract_policy(Q, no_states, no_actions, T, R, gamma=0.9):
     '''
-    Procedure to extract a policy from a value function
-    pi <-- argmax_a R^a + gamma T^a V
+    Extract Policy from Q-learning matrix
 
-    Inputs:
-    V -- Value function: array of |S| entries
-
-    Output:
-    policy -- Policy array P
+    Since Q is already calculated, just retrieve the max.
     '''
-    # initialize random(uniform) policy
-    # P = np.ones((no_states, no_actions)) * (1 / no_actions)
     P = np.zeros((no_states, no_actions))
 
     for s in range(no_states):
-        # max_q = max(Q[s])
         best_action = np.argmin(Q[s])
         P[s][best_action] = 1
 
