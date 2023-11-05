@@ -88,21 +88,6 @@ env = GridEnv(no_states, no_actions)
 # print(mdp.step(MOVE_DOWN))
 
 
-def extract_policy(Q, no_states, no_actions, T, R, gamma=0.9):
-    '''
-    Extract Policy from Q-learning matrix
-
-    Since Q is already calculated, just retrieve the max.
-    '''
-    P = np.zeros((no_states, no_actions))
-
-    for s in range(no_states):
-        best_action = np.argmax(Q[s])
-        P[s][best_action] = 1
-
-    return P
-
-
 '''
 # Question 2 - Q learning
 '''
@@ -157,20 +142,33 @@ for e in range(no_episodes):
                             np.exp(-exploration_decreasing_decay*e))
     rewards_per_episode.append(total_episode_reward)
 
-#
+#########################
 # show Q values
-#
 print(Q)
 
-#
+
+#########################
 # show the final policy
 # in each state, choose action that maximizes Q value
-#
+def extract_policy(Q, no_states, no_actions):
+    '''
+    Extract Policy from Q-learning matrix
+    Since Q is already calculated, just retrieve the max.
+    '''
+    P = np.zeros((no_states, no_actions))
+
+    for s in range(no_states):
+        best_action = np.argmax(Q[s])
+        P[s][best_action] = 1
+
+    return P
+
+
 # for s in range(no_states):
 #     for a in range(no_actions):
 #         if Q[s][a] == 0:
 #             Q[s][a] -= 10000
-P = extract_policy(Q, no_states, no_actions, env.T, env.R)
+P = extract_policy(Q, no_states, no_actions)
 pretty_policy(P, elements_in_row, env.E, env.B, 'hw2')
 
 #
