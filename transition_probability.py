@@ -128,6 +128,8 @@ def generate(no_states, no_actions, state_reward, elements_in_row, B=[], R=[],
 
 
 def is_valid(old_state, new_state, elements_in_row, no_states, relaxed=False):
+    new_column = new_state % elements_in_row
+    old_column = old_state % elements_in_row
     if new_state > 0 and new_state < no_states:
         # Same Row, Left/Right Possible
         if math.floor(new_state / elements_in_row) == \
@@ -137,11 +139,11 @@ def is_valid(old_state, new_state, elements_in_row, no_states, relaxed=False):
             else:
                 return False
         # Same Column, Up/Down Possible
-        if (new_state % elements_in_row) == (old_state % elements_in_row):
+        if new_column == old_column:
             return True
         if relaxed:
             if abs(new_state - old_state) <= 2:
-                if (new_state % elements_in_row - old_state % elements_in_row) < 2:
+                if abs(new_column - old_column) < 2:
                     return True
                 else:
                     return False
