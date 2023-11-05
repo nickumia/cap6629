@@ -143,7 +143,7 @@ def policy_eval(policy, max_iter):
                 v_all = 0
                 for sp in range(no_states):
                     # This should only return valid moves
-                    # if T[s][sp][a] == 1:
+                    # if T[s][sp][a] > 0:
                     #     print(s, sp, get_action[a], T[s][sp][a])
                     if s not in E:
                         v_all += T[s][sp][a] * V_0[sp]
