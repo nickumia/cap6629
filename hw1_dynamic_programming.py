@@ -1,6 +1,5 @@
 
 import math
-import matplotlib.pyplot as plt
 import numpy as np
 import os
 import sys
@@ -9,9 +8,7 @@ from agents import MazeRunner
 import transition_probability
 from cap6635.environment.map import Map2D
 from cap6635.utilities.plot import MazeAnimator
-from cap6635.utilities.constants import (
-    MOVE_UP, MOVE_DOWN, MOVE_LEFT, MOVE_RIGHT
-)
+from hw1_utils import extract_policy, pretty_policy  # , get_action
 
 # import matplotlib
 # matplotlib.use('TkAgg')
@@ -36,7 +33,6 @@ no_states = elements_in_row ** 2
 
 # Actions: up(0)|down(1)|left(2)|right(3)
 no_actions = 4
-get_action = {MOVE_UP: '^', MOVE_DOWN: 'v', MOVE_LEFT: '<', MOVE_RIGHT: '>'}
 # Discount factor: scalar in [0,1)
 gamma = 0.9
 # Goal Reward
@@ -297,21 +293,8 @@ print("Number of Iterations: %d" % (no_iter))
 '''''''''''''''''''''''''''''''''''''''''
 Section D (Extra)
 '''''''''''''''''''''''''''''''''''''''''
-policy = Map2D(elements_in_row + 2, elements_in_row + 2)
-for i, s in enumerate(P):
-    action = np.where(s == 1)[0][0]
-    y = (i % elements_in_row) + 1
-    x = (math.floor(i / elements_in_row)) + 1
-    if i in E:
-        plt.text(y, x, "x", color='green')
-    elif i in B:
-        plt.text(y, x, "o", color='green')
-    else:
-        plt.text(y, x, get_action[action], color='green')
-    plt.imshow(policy.map, 'pink')
-plt.savefig('policy_%s_%s_%s.png' % (elements_in_row, algo, deterministic))
-plt.clf()
-
+pretty_policy(P, elements_in_row, E, B,
+              str(elements_in_row)+algo+str(deterministic))
 print('Animating...')
 
 
