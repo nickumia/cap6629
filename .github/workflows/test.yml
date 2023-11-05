@@ -23,19 +23,46 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        agent_type: [1]
+        agent_type: ['v', 'p', 'e']
+        starting_position: [0, 50]
+        deterministic: ['y', 'n']
+        include:
+          - elements: 10
+          - simulation: 'y'
+        exclude:
+          - agent_type: 'e'
+            deterministic: 'n'
     steps:
       - name: Checkout
         uses: actions/checkout@v2
       - name: Install
         run: pip install cap6635
       - name: Clean
-        run: python hw1_dynamic_programming.py
+        run: >
+          python hw1_dynamic_programming.py ${{matrix.elements}}
+          ${{matrix.agent_type}} ${{matrix.deterministic}}
+          ${{matrix.simulation}} ${{matrix.starting_position}}
       - name: Animation Output
         uses: actions/upload-artifact@v3
         if: always()
         with:
           name: maze
           path: |
-            ./maze.gif
-            ./policy.png
+            ./policy_10_e_True.png
+            ./policy_10_e_False.png
+            ./policy_10_v_True.png
+            ./policy_10_v_False.png
+            ./policy_10_p_True.png
+            ./policy_10_p_False.png
+            ./maze_10_e_True_0.gif
+            ./maze_10_e_False_0.gif
+            ./maze_10_v_True_0.gif
+            ./maze_10_v_False_0.gif
+            ./maze_10_p_True_0.gif
+            ./maze_10_p_False_0.gif
+            ./maze_10_e_True_50.gif
+            ./maze_10_e_False_50.gif
+            ./maze_10_v_True_50.gif
+            ./maze_10_v_False_50.gif
+            ./maze_10_p_True_50.gif
+            ./maze_10_p_False_50.gif

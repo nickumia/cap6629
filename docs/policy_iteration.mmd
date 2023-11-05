@@ -1,0 +1,14 @@
+graph LR
+    T[(Trans Prob)]
+    R[(Reward)]
+    q0[("`q <sub>0</sub>`")]
+    T --> q0
+    R --> q0
+    v0 --> q0
+    p0 --> v1
+    q0 --> v1
+    T --> q1
+    R --> q1
+    v1 --> q1
+    q1 --> max
+    max --> P1

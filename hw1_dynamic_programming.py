@@ -3,6 +3,7 @@ import math
 import matplotlib.pyplot as plt
 import numpy as np
 import os
+import sys
 
 from agents import MazeRunner
 import transition_probability
@@ -16,9 +17,23 @@ from cap6635.utilities.constants import (
 # matplotlib.use('TkAgg')
 
 
+usage = ('Usage:\n'
+         'python3 hw1_dynamic_programming.py <elements_in_row> <algorithm>\n'
+         '     <deterministic(y/n)> <simulation(y/n)> [starting_state]\n\n'
+         'algorithms to choose from:\n'
+         '(v) Value Iteration\n'
+         '(p) Policy Iteration\n'
+         '(e) Policy Evaluation\n')
+
 # States: size of your Grid (|column| * |row|)
-elements_in_row = 10
+try:
+    elements_in_row = int(sys.argv[1])
+except ValueError:
+    elements_in_row = 10
+except IndexError:
+    elements_in_row = 10
 no_states = elements_in_row ** 2
+
 # Actions: up(0)|down(1)|left(2)|right(3)
 no_actions = 4
 get_action = {MOVE_UP: '^', MOVE_DOWN: 'v', MOVE_LEFT: '<', MOVE_RIGHT: '>'}
@@ -27,8 +42,32 @@ gamma = 0.9
 # Goal Reward
 goal_reward = 0
 state_reward = -1
-# GUI on?
-gui = True
+
+try:
+    algo = sys.argv[2]
+except IndexError:
+    algo = 'v'
+try:
+    if sys.argv[3] == 'n':
+        deterministic = False
+    else:
+        deterministic = True
+except BaseException:
+    print(usage)
+    sys.exit(1)
+
+try:
+    if sys.argv[4] == 'n':
+        gui = False
+    else:
+        gui = True
+        try:
+            start_pos = int(sys.argv[5])
+        except ValueError:
+            start_pos = 0
+except BaseException:
+    print(usage)
+    sys.exit(1)
 
 '''''''''''''''''''''''''''''''''''''''''
 Section 0 (Part 2)
@@ -62,7 +101,8 @@ R = np.ones((no_states, no_actions)) * state_reward * 10
 # Deterministic Transition
 T = transition_probability.generate(no_states, no_actions, state_reward,
                                     elements_in_row, B=B, R=R,
-                                    deterministic=False)
+                                    deterministic=deterministic)
+
 for e in E:
     R[e][:] = goal_reward
 
@@ -103,7 +143,7 @@ def policy_eval(policy, max_iter):
                 v_all = 0
                 for sp in range(no_states):
                     # This should only return valid moves
-                    # if T[s][sp][a] == 1:
+                    # if T[s][sp][a] > 0:
                     #     print(s, sp, get_action[a], T[s][sp][a])
                     if s not in E:
                         v_all += T[s][sp][a] * V_0[sp]
@@ -229,24 +269,29 @@ Section C (Part 4)
 
 # 4.1.1a Random(uniform) Policy defined above
 # 4.1.1b Show the results of policy_eval
-# V, no_iter = policy_eval(P, 1000)
-# print(V)
-# print("Number of Iterations: %d" % (no_iter))
+if algo.lower() == 'e':
+    V, no_iter = policy_eval(P, 1000)
+    print(V)
+    # 4.1.3b Extract policy from V values
+    P = extract_policy(V)
+    print(P)
 
 # 4.1.2 Run Policy Iteration and show the results
-# (P, V, no_iter) = policy_iter(P, 500)
-# print(V)
-# print("Number of Iterations: %d" % (no_iter))
+if algo.lower() == 'p':
+    (P, V, no_iter) = policy_iter(P, 500)
+    print(V)
+    print(P)
 
 # 4.1.3a Run Value Iteration and show the results
-V = np.ones(no_states) * -1000
-(V, no_iter) = value_iter(V, 500)
-print(V)
-print("Number of Iterations: %d" % (no_iter))
+if algo.lower() == 'v':
+    V = np.ones(no_states) * -1000
+    (V, no_iter) = value_iter(V, 500)
+    print(V)
+    # 4.1.3b Extract policy from V values
+    P = extract_policy(V)
+    print(P)
 
-# 4.1.3b Extract policy from V values
-P = extract_policy(V)
-print(P)
+print("Number of Iterations: %d" % (no_iter))
 
 
 '''''''''''''''''''''''''''''''''''''''''
@@ -264,7 +309,7 @@ for i, s in enumerate(P):
     else:
         plt.text(y, x, get_action[action], color='green')
     plt.imshow(policy.map, 'pink')
-plt.savefig('policy.png')
+plt.savefig('policy_%s_%s_%s.png' % (elements_in_row, algo, deterministic))
 plt.clf()
 
 print('Animating...')
@@ -283,9 +328,13 @@ if gui:
             (b % elements_in_row) + 1
             ] = 5
 
-    a = MazeRunner(maze, P, state=40, start=(4, 1),
+    sx = math.floor(start_pos / elements_in_row) + 1
+    sy = math.floor(start_pos % elements_in_row) + 1
+    a = MazeRunner(maze, P, state=start_pos, start=(sx, sy),
                    elements_in_row=elements_in_row)
-    animator = MazeAnimator(os.getcwd(), '/maze.gif')
+    maze_name = '/maze_%s_%s_%s_%s.gif' % (elements_in_row, algo,
+                                           deterministic, start_pos)
+    animator = MazeAnimator(os.getcwd(), maze_name)
     animator.temp = '/temp/'
     animator.save_state(i, maze, a)
     i = 0

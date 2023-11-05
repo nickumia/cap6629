@@ -30,7 +30,7 @@ def generate(no_states, no_actions, state_reward, elements_in_row, B=[], R=[],
     T = np.zeros((no_states, no_states, no_actions))
 
     for i in range(no_states):
-        if i % elements_in_row != 0:
+        if (i % elements_in_row != 0 and i != 0):
             # print("LEFT", i, i-1)
             if deterministic:
                 T[i][i-1][MOVE_LEFT] = 1
@@ -38,10 +38,14 @@ def generate(no_states, no_actions, state_reward, elements_in_row, B=[], R=[],
                 T[i][i-1][MOVE_LEFT] = (1 - no_actions * alpha)
                 for slippery in [i, i-2, i-1-elements_in_row,
                                  i-1+elements_in_row]:
-                    if slippery not in B:
+                    if slippery not in B and i not in B:
                         if is_valid(i, slippery,
                                     elements_in_row, no_states, relaxed=True):
                             T[i][slippery][MOVE_LEFT] = alpha
+                        else:
+                            T[i][i-1][MOVE_LEFT] += alpha
+                    else:
+                        T[i][i-1][MOVE_LEFT] += alpha
             if i - 1 not in B:
                 R[i][MOVE_LEFT] = state_reward
         if (i % elements_in_row != (elements_in_row-1) and i != (no_states-1)):
@@ -52,14 +56,18 @@ def generate(no_states, no_actions, state_reward, elements_in_row, B=[], R=[],
                 T[i][i+1][MOVE_RIGHT] = (1 - no_actions * alpha)
                 for slippery in [i, i+2, i+1-elements_in_row,
                                  i+1+elements_in_row]:
-                    if slippery not in B:
+                    if slippery not in B and i not in B:
                         if is_valid(i, slippery,
                                     elements_in_row, no_states, relaxed=True):
                             T[i][slippery][MOVE_RIGHT] = alpha
+                        else:
+                            T[i][i+1][MOVE_RIGHT] += alpha
+                    else:
+                        T[i][i+1][MOVE_RIGHT] += alpha
             if i + 1 not in B:
                 R[i][MOVE_RIGHT] = state_reward
         if i < (no_states - elements_in_row):
-            # print("DOWN", i, i+10)
+            # print("DOWN", i, i+elements_in_row)
             if deterministic:
                 T[i][i + elements_in_row][MOVE_DOWN] = 1
             else:
@@ -67,10 +75,14 @@ def generate(no_states, no_actions, state_reward, elements_in_row, B=[], R=[],
                 for slippery in [i, i+elements_in_row+1,
                                  i+elements_in_row+elements_in_row,
                                  i+elements_in_row-1]:
-                    if slippery not in B:
+                    if slippery not in B and i not in B:
                         if is_valid(i, slippery,
                                     elements_in_row, no_states, relaxed=True):
                             T[i][slippery][MOVE_DOWN] = alpha
+                        else:
+                            T[i][i + elements_in_row][MOVE_DOWN] += alpha
+                    else:
+                        T[i][i + elements_in_row][MOVE_DOWN] += alpha
             if i + elements_in_row not in B:
                 R[i][MOVE_DOWN] = state_reward
         if i > elements_in_row-1:
@@ -81,10 +93,14 @@ def generate(no_states, no_actions, state_reward, elements_in_row, B=[], R=[],
                 for slippery in [i, i-elements_in_row+1,
                                  i-elements_in_row-elements_in_row,
                                  i-elements_in_row-1]:
-                    if slippery not in B:
+                    if slippery not in B and i not in B:
                         if is_valid(i, slippery,
                                     elements_in_row, no_states, relaxed=True):
                             T[i][slippery][MOVE_UP] = alpha
+                        else:
+                            T[i][i - elements_in_row][MOVE_UP] += alpha
+                    else:
+                        T[i][i - elements_in_row][MOVE_UP] += alpha
             if i - elements_in_row not in B:
                 R[i][MOVE_UP] = state_reward
 
@@ -112,19 +128,29 @@ def generate(no_states, no_actions, state_reward, elements_in_row, B=[], R=[],
 
 
 def is_valid(old_state, new_state, elements_in_row, no_states, relaxed=False):
+    new_column = new_state % elements_in_row
+    old_column = old_state % elements_in_row
     if new_state > 0 and new_state < no_states:
         # Same Row, Left/Right Possible
         if math.floor(new_state / elements_in_row) == \
            math.floor(old_state / elements_in_row):
-            return True
+            if abs(new_state - old_state) <= 2:
+                return True
+            else:
+                return False
         # Same Column, Up/Down Possible
-        if (new_state % elements_in_row) == (old_state % elements_in_row):
+        if new_column == old_column:
             return True
         if relaxed:
+            if abs(new_state - old_state) <= 2:
+                if abs(new_column - old_column) < 2:
+                    return True
+                else:
+                    return False
             return True
     return False
 
-# print(is_valid(5,7,10, 100))
+# print(is_valid(0,9,10, 100))
 # print(is_valid(9,11,10, 100))
 # print(is_valid(50,49,10, 100))
 # print(is_valid(76,66,10, 100))
