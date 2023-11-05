@@ -8,7 +8,7 @@ from agents import MazeRunner
 import transition_probability
 from cap6635.environment.map import Map2D
 from cap6635.utilities.plot import MazeAnimator
-from hw1_utils import extract_policy, pretty_policy  # , get_action
+from hw1_utils import pretty_policy  # , get_action
 
 # import matplotlib
 # matplotlib.use('TkAgg')
