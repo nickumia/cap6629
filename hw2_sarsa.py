@@ -5,7 +5,6 @@ from cap6635.utilities.constants import (
 import numpy as np
 import random
 
-# from hw1_utils import extract_policy
 from hw1_utils import pretty_policy
 import transition_probability as tp
 
@@ -98,17 +97,15 @@ def extract_policy(Q, no_states, no_actions, T, R, gamma=0.9):
     P = np.zeros((no_states, no_actions))
 
     for s in range(no_states):
-        best_action = np.argmin(Q[s])
+        best_action = np.argmax(Q[s])
         P[s][best_action] = 1
 
     return P
 
 
-#
-# Question 2
-#
-# Q learning
-#
+'''
+# Question 2 - Q learning
+'''
 # initialize alpha value
 alpha = 0.02
 
@@ -128,16 +125,12 @@ Q = np.zeros((no_states, no_actions))
 for e in range(no_episodes):
     current_state = env.reset()
     done = False
-
     total_episode_reward = 0
 
     for i in range(max_iter):
-        #
-        # epsilon greedy behavior policy
-        #
-        # select an action based on epsilon greedy policy
+        # Epsilon-Greedy Behavior Policy
         choice = random.random()
-        if choice > epsilon:
+        if choice < epsilon:
             action = random.choice([MOVE_UP, MOVE_DOWN, MOVE_LEFT, MOVE_RIGHT])
         else:
             action = np.argmax(Q[current_state])
@@ -148,8 +141,9 @@ for e in range(no_episodes):
 
         # PART (A)
         # We update our Q-table using the Q-learning iteration
-        Q[current_state, action] = Q[current_state, action] + alpha * \
-            (reward + gamma * max(Q[next_state, :]))
+        Q[current_state, action] += \
+            alpha * (reward + gamma * max(Q[next_state, :])
+                     - Q[current_state, action])
         # END PART (A)
 
         total_episode_reward += reward
@@ -172,6 +166,10 @@ print(Q)
 # show the final policy
 # in each state, choose action that maximizes Q value
 #
+# for s in range(no_states):
+#     for a in range(no_actions):
+#         if Q[s][a] == 0:
+#             Q[s][a] -= 10000
 P = extract_policy(Q, no_states, no_actions, env.T, env.R)
 pretty_policy(P, elements_in_row, env.E, env.B, 'hw2')
 
