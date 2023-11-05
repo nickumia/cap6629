@@ -317,10 +317,10 @@ if gui:
                    elements_in_row=elements_in_row)
     maze_name = '/maze_%s_%s_%s_%s.gif' % (elements_in_row, algo,
                                            deterministic, start_pos)
+    i = 0
     animator = MazeAnimator(os.getcwd(), maze_name)
     animator.temp = '/temp/'
     animator.save_state(i, maze, a)
-    i = 0
     while a.state not in E:
         # Starting position
         a.move()
