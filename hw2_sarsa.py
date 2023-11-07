@@ -185,7 +185,8 @@ Q = ql.learn(env)
 print(Q)
 
 P = extract_policy(Q, no_states, no_actions)
-pretty_policy(P, elements_in_row, env.E, env.B, 'hw2')
+pretty_policy(P, elements_in_row, env.E, env.B,
+              str(elements_in_row)+algo+str(start_pos))
 print('Animating...')
 
 
