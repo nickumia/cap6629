@@ -25,56 +25,57 @@ class GridEnv:
     '''
 
     def __init__(self, no_states, no_actions, start=0):
+        # Save starting state to track each episode
         self._start = start
-        self.current_state = start
+        self._current_state = start
+
         # States that have obstacles
         self.B = [3, 8, 10, 12, 13, 14, 17, 31, 35, 40, 49, 55, 62, 84, 88]
         # Final States
         self.E = [69, 92]
 
-        # 1-3) Reward Function: |S| x |A| array
+        # Reward Function (same as hw1)
         self.R = np.ones((no_states, no_actions)) * state_reward * 10
 
-        # Deterministic Transition
+        # Transition Probability (deterministic-only)
         self.T = tp.generate(no_states, no_actions, state_reward,
                              elements_in_row, B=self.B, R=self.R,
                              deterministic=True)
         for e in self.E:
             self.R[e][:] = 0
 
-    #
-    # step function: reads action and returns next-state, reward, done, info
-    # Input
-    #   action: action value of agent
-    #
-    # Output
-    #   state: next state
-    #   reward: reward value
-    #   done: whether the agent terminated (e.g., reached final state or
-    #   maximum itertation, etc)
-    #   info: other information
     def step(self, action):
+        '''
+        Reads action and returns next-state, reward, done, info
+        '''
+        done = False
+        msg = ""
+        # States that can be achieved with given action
         possible_states = []
         for i in range(100):
-            if self.T[self.current_state][i][action] >= 1:
+            if self.T[self._current_state][i][action] >= 1:
                 possible_states.append(i)
         try:
-            new_state = random.choice(possible_states)
-            self.current_state = new_state
-        except IndexError:
-            return self.current_state, 0, False, "Action not possible"
-        reward = self.R[self.current_state][action]
-        if new_state in self.E:
-            done = True
-        else:
-            done = False
-        return new_state, reward, done, ""
+            # Reward for new state
+            self._current_state = random.choice(possible_states)
+            reward = self.R[self._current_state][action]
 
-    # agent returns to start state
-    # begins another episode
+            # Is the new state a goal?
+            if self._current_state in self.E:
+                done = True
+                msg = "Goal!"
+            else:
+                msg = "Still searching..."
+        except IndexError:
+            msg = "Action not possible"
+
+        reward = self.R[self._current_state][action]
+        return self._current_state, reward, done, msg
+
     def reset(self):
-        self.current_state = self._start
-        return self.current_state
+        ''' Begin another episode at starting state '''
+        self._current_state = self._start
+        return self._current_state
 
     # not implemented yet
     # def render(self):
@@ -84,21 +85,23 @@ class GridEnv:
 no_states = 100
 no_actions = 4
 env = GridEnv(no_states, no_actions)
-# print(mdp.step(MOVE_RIGHT))
-# print(mdp.step(MOVE_DOWN))
+# print(env.step(MOVE_RIGHT))
+# env.reset()
+# print(env.step(MOVE_DOWN))
+
 
 
 '''
 # Question 2 - Q learning
 '''
 # initialize alpha value
-alpha = 0.02
+alpha = 0.2
 
 # define parameters: epsilon, gamma (discount factor)
 epsilon = 0.2
 gamma = 0.9
 
-max_iter = 200
+max_iter = 100
 no_episodes = 1000
 
 min_exploration_proba = 0.05
@@ -120,15 +123,19 @@ for e in range(no_episodes):
         else:
             action = np.argmax(Q[current_state])
 
-        # The environment mdp runs the chosen action and returns
+        # The environment env runs the chosen action and returns
         # the next state, a reward and true if the epiosed is ended.
-        next_state, reward, done, _ = env.step(action)
+        next_state, reward, done, inf = env.step(action)
+        # print(inf)
 
         # PART (A)
         # We update our Q-table using the Q-learning iteration
         Q[current_state, action] += \
             alpha * (reward + gamma * max(Q[next_state, :])
                      - Q[current_state, action])
+        # Q[current_state, action] += \
+        #     alpha * (reward + gamma * Q[next_state, action]
+        #              - Q[current_state, action])
         # END PART (A)
 
         total_episode_reward += reward
@@ -164,10 +171,6 @@ def extract_policy(Q, no_states, no_actions):
     return P
 
 
-# for s in range(no_states):
-#     for a in range(no_actions):
-#         if Q[s][a] == 0:
-#             Q[s][a] -= 10000
 P = extract_policy(Q, no_states, no_actions)
 pretty_policy(P, elements_in_row, env.E, env.B, 'hw2')
 
