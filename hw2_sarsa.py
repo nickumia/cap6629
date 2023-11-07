@@ -90,67 +90,88 @@ env = GridEnv(no_states, no_actions)
 # print(env.step(MOVE_DOWN))
 
 
-
 '''
 # Question 2 - Q learning
 '''
-# initialize alpha value
-alpha = 0.2
 
-# define parameters: epsilon, gamma (discount factor)
-epsilon = 0.2
-gamma = 0.9
 
-max_iter = 100
-no_episodes = 1000
+class QLearning:
+    def __init__(self, no_states, no_actions, max_iter=100, no_episodes=1000):
+        # initialize alpha value
+        self._alpha = 0.2
 
-min_exploration_proba = 0.05
-exploration_decreasing_decay = 0.9
-rewards_per_episode = []
+        # define parameters: epsilon, gamma (discount factor)
+        self._epsilon = 0.2
+        self._gamma = 0.9
 
-Q = np.zeros((no_states, no_actions))
+        self._max_iter = max_iter
+        self._no_episodes = no_episodes
 
-for e in range(no_episodes):
-    current_state = env.reset()
-    done = False
-    total_episode_reward = 0
+        self._exploration_proba = self._epsilon
+        self._min_exploration_proba = 0.05
+        self._exploration_decay = 0.9
+        self._rewards_per_episode = []
 
-    for i in range(max_iter):
-        # Epsilon-Greedy Behavior Policy
-        choice = random.random()
-        if choice < epsilon:
-            action = random.choice([MOVE_UP, MOVE_DOWN, MOVE_LEFT, MOVE_RIGHT])
-        else:
-            action = np.argmax(Q[current_state])
+        self.reset()
 
-        # The environment env runs the chosen action and returns
-        # the next state, a reward and true if the epiosed is ended.
-        next_state, reward, done, inf = env.step(action)
-        # print(inf)
+    def q_learning(self, current_state, next_state, action, reward):
+        self._Q[current_state, action] += \
+            self._alpha * (
+                reward + self._gamma * max(self._Q[next_state, :])
+                - self._Q[current_state, action])
 
-        # PART (A)
-        # We update our Q-table using the Q-learning iteration
-        Q[current_state, action] += \
-            alpha * (reward + gamma * max(Q[next_state, :])
-                     - Q[current_state, action])
-        # Q[current_state, action] += \
-        #     alpha * (reward + gamma * Q[next_state, action]
-        #              - Q[current_state, action])
-        # END PART (A)
+    def sarsa(self, current_state, next_state, action, reward):
+        self._Q[current_state, action] += \
+            self._alpha * (
+                reward + self._gamma * self._Q[next_state, action]
+                - self._Q[current_state, action])
 
-        total_episode_reward += reward
-        # If the episode is finished, we leave the for loop
-        if done:
-            break
-        current_state = next_state
+    def learn(self, env, sarsa=False):
+        for e in range(self._no_episodes):
+            current_state = env.reset()
+            done = False
+            total_episode_reward = 0
 
-    # decrease epsilon value
-    exploration_proba = max(min_exploration_proba,
-                            np.exp(-exploration_decreasing_decay*e))
-    rewards_per_episode.append(total_episode_reward)
+            for i in range(self._max_iter):
+                # Epsilon-Greedy Behavior Policy
+                choice = random.random()
+                if choice < self._exploration_proba:
+                    action = random.choice([MOVE_UP, MOVE_DOWN,
+                                            MOVE_LEFT, MOVE_RIGHT])
+                else:
+                    action = np.argmax(self._Q[current_state])
+
+                # The environment env runs the chosen action and returns
+                # the next state, a reward and true if the epiosed is ended.
+                next_state, reward, done, _ = env.step(action)
+
+                # We update our Q-table using the Q-learning iteration
+                if sarsa:
+                    self.sarsa(current_state, next_state, action, reward)
+                else:
+                    self.q_learning(current_state, next_state, action, reward)
+
+                total_episode_reward += reward
+                # If the episode is finished, we leave the for loop
+                if done:
+                    break
+                current_state = next_state
+
+            # decrease epsilon value
+            self._exploration_proba = \
+                max(self._min_exploration_proba,
+                    np.exp(-self._exploration_decay*self._epsilon))
+            self._rewards_per_episode.append(total_episode_reward)
+        return self._Q
+
+    def reset(self):
+        self._Q = np.zeros((no_states, no_actions))
+
 
 #########################
 # show Q values
+ql = QLearning(no_states, no_actions)
+Q = ql.learn(env)
 print(Q)
 
 
@@ -173,24 +194,3 @@ def extract_policy(Q, no_states, no_actions):
 
 P = extract_policy(Q, no_states, no_actions)
 pretty_policy(P, elements_in_row, env.E, env.B, 'hw2')
-
-#
-# #
-# # Question 3
-# #
-# # Sarsa
-# #
-# # modify PART (A) in Q learning as follows
-# # 1) next_action = action chosen in 'next_state' using epsilon greedy.
-# # 2) max(Q[next_state,:] is replaced by Q[next_state, next_action]
-# # the rest of the code is same.
-# #
-#
-# #
-# # show Q values
-# #
-#
-# #
-# # show the final policy
-# # in each state, choose action that maximizes Q value
-# #
