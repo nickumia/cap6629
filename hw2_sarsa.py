@@ -191,4 +191,4 @@ print('Animating...')
 
 maze_name = '/maze_%s_%s_%s.gif' % (elements_in_row, algo, start_pos)
 if gui:
-    animate(start_pos, env.E, env.B, elements_in_row, algo, P)
+    animate(start_pos, env.E, env.B, elements_in_row, algo, P, maze_name)
