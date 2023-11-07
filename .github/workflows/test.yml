@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
       - name: Install
         run: pip install coverage flake8 pytest
       - name: Lint
@@ -34,7 +34,7 @@ jobs:
             deterministic: 'n'
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
       - name: Install
         run: pip install cap6635
       - name: Clean
@@ -46,23 +46,38 @@ jobs:
         uses: actions/upload-artifact@v3
         if: always()
         with:
-          name: maze
+          name: hw1
           path: |
-            ./policy_10_e_True.png
-            ./policy_10_e_False.png
-            ./policy_10_v_True.png
-            ./policy_10_v_False.png
-            ./policy_10_p_True.png
-            ./policy_10_p_False.png
-            ./maze_10_e_True_0.gif
-            ./maze_10_e_False_0.gif
-            ./maze_10_v_True_0.gif
-            ./maze_10_v_False_0.gif
-            ./maze_10_p_True_0.gif
-            ./maze_10_p_False_0.gif
-            ./maze_10_e_True_50.gif
-            ./maze_10_e_False_50.gif
-            ./maze_10_v_True_50.gif
-            ./maze_10_v_False_50.gif
-            ./maze_10_p_True_50.gif
-            ./maze_10_p_False_50.gif
+            *.png
+            *.gif
+
+  q_learning:
+    name: Maze Runner (q-learning)
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        agent_type: ['q', 's']
+        starting_position: [0, 30, 9, 50]
+        deterministic: ['y']
+        include:
+          - elements: 10
+          - simulation: 'y'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Install
+        run: pip install cap6635
+      - name: Clean
+        run: >
+          python hw2_sarsa.py ${{matrix.elements}}
+          ${{matrix.agent_type}} ${{matrix.deterministic}}
+          ${{matrix.simulation}} ${{matrix.starting_position}}
+      - name: Animation Output
+        uses: actions/upload-artifact@v3
+        if: always()
+        with:
+          name: hw2
+          path: |
+            *.png
+            *.gif
