@@ -5,11 +5,29 @@ from cap6635.utilities.constants import (
 import numpy as np
 import random
 
-from hw1_utils import pretty_policy
+from hw1_utils import pretty_policy, gather_inputs, hw2_usage, animate
 import transition_probability as tp
 
 state_reward = -1
-elements_in_row = 10
+elements_in_row, algo, _, gui, start_pos = gather_inputs(hw2_usage)
+no_states = elements_in_row ** 2
+
+
+#########################
+# show the final policy
+# in each state, choose action that maximizes Q value
+def extract_policy(Q, no_states, no_actions):
+    '''
+    Extract Policy from Q-learning matrix
+    Since Q is already calculated, just retrieve the max.
+    '''
+    P = np.zeros((no_states, no_actions))
+
+    for s in range(no_states):
+        best_action = np.argmax(Q[s])
+        P[s][best_action] = 1
+
+    return P
 
 
 class GridEnv:
@@ -81,21 +99,8 @@ class GridEnv:
     # def render(self):
 
 
-# create environment
-no_states = 100
-no_actions = 4
-env = GridEnv(no_states, no_actions)
-# print(env.step(MOVE_RIGHT))
-# env.reset()
-# print(env.step(MOVE_DOWN))
-
-
-'''
-# Question 2 - Q learning
-'''
-
-
 class QLearning:
+    ''' Question 2: Q-Learning '''
     def __init__(self, no_states, no_actions, max_iter=100, no_episodes=1000):
         # initialize alpha value
         self._alpha = 0.2
@@ -169,28 +174,21 @@ class QLearning:
 
 
 #########################
-# show Q values
+# Main Algorithm
+no_states = 100
+no_actions = 4
+
+env = GridEnv(no_states, no_actions)
 ql = QLearning(no_states, no_actions)
+
 Q = ql.learn(env)
 print(Q)
 
-
-#########################
-# show the final policy
-# in each state, choose action that maximizes Q value
-def extract_policy(Q, no_states, no_actions):
-    '''
-    Extract Policy from Q-learning matrix
-    Since Q is already calculated, just retrieve the max.
-    '''
-    P = np.zeros((no_states, no_actions))
-
-    for s in range(no_states):
-        best_action = np.argmax(Q[s])
-        P[s][best_action] = 1
-
-    return P
-
-
 P = extract_policy(Q, no_states, no_actions)
 pretty_policy(P, elements_in_row, env.E, env.B, 'hw2')
+print('Animating...')
+
+
+maze_name = '/maze_%s_%s_%s.gif' % (elements_in_row, algo, start_pos)
+if gui:
+    animate(start_pos, env.E, env.B, elements_in_row, algo, P)
