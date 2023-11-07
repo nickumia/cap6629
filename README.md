@@ -1,3 +1,5 @@
+[![Tests](https://github.com/nickumia/cap6629/actions/workflows/test.yml/badge.svg)](https://github.com/nickumia/cap6629/actions/workflows/test.yml)
+
 # cap6629
 A summary of Reinforcement Learning techniques explored in Dr. Lee's class
 
